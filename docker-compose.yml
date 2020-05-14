@@ -12,7 +12,6 @@ services:
     volumes:
       - .:/usr/src/app
       - ./.bundle:/usr/local/bundle
-
   db:
 
     image: postgres

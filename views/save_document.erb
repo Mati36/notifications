@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es"> 
+    <head>
+        <meta charset = "utf-8">
+        <title>save_document</title>
+        <script type="text/javascript" src="fileManager.js"></script>
+    </head>
+    <body>
+        <div class="save_document">
+            <form action="save_document" method="POST">
+                <label for="title">Titulo</label> 
+                <input type="text" name="title"> <br>
+                <label for="type" >Tipo</label> 
+                <select id="type" name="type">
+                    <option value="Act">Acta</option>
+                    <option value="Resolution">Resolucion</option>
+                </select>
+                <button type="button" onclick="document.getElementById('fileInput').click();">Examinar...</button> 
+                <input id="fileInput" type="file" accept= ".pdf, .jpg, .jpeg, .png" onChange='getFileExtension()' style="display: none;" /> <br>
+                <input name="format" id="format" type="hidden" />
+                <input type="submit" value="Subir Documento"> 
+            </form>
+        </div>
+    </body>
+
+</html>

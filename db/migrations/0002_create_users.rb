@@ -6,6 +6,8 @@ Sequel.migration do
         add_column :users, :password,   String,  null: false 
         add_column :users, :created_at, DateTime    
         add_column :users, :updated_at, DateTime
+        
+        
     end 
 
     down do 
@@ -14,5 +16,7 @@ Sequel.migration do
         drop_column :users, :password
         drop_column :users, :created_at
         drop_column :users, :updated_at
+        
+        
     end  
 end    
