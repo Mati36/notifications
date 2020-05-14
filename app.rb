@@ -11,36 +11,29 @@ class App < Sinatra::Base
     set :sessions_fail, '/'
     set :sessions_secret, "inhakiable papuuu"
     set :sessions_fail, true
-    set :no_auth_neededs, ['/login']
   end 
 
   before do 
-    request.path_info
-    if !session[:user_id]
+    @path = request.path_info
+    logger.info(session[:user_id])
+    logger.info(session[:user_name])
+    if !session[:user_id] && @path != '/login' && @path != '/signUp'
       redirect '/login'
     elsif session[:user_id]
-      @current_user = User.find(id: session[:user_id])
+      user = User.find(id: session[:user_id])
+      logger.info(user.name);
     end
   end
 
-
   get "/" do
     "hola"
-  end
-
-  post "/" do
-    "hola"
-  end
-
-  get '/index' do
-    erb :index, :locals => {:name => params[:name]}
   end
 
   post '/signUp' do
     request.body.rewind 
     hash = Rack::Utils.parse_nested_query(request.body.read)
     params = JSON.parse hash.to_json 
-    user = User.new(name: params['name'], lastname: params['lastname'],email: params['email'],password: params['pwd'] )
+    user = User.new(name: params['name'], lastname: params['lastname'], dni: params['dni'], email: params['email'],password: params['pwd'] )
     
     if user.save
       redirect '/login'
@@ -50,11 +43,14 @@ class App < Sinatra::Base
     end 
   end
 
-  get '/save_document' do
-    if sessions[:user.id].present?
-      user = User.find(id: session[:user_id])
-      user.name
-    end  
+  get '/signUp' do
+    if session[:user_id]
+      session.clear
+    end
+    erb :signUp
+  end
+
+  get '/save_document' do 
     erb :save_document
   end
 
@@ -62,7 +58,7 @@ class App < Sinatra::Base
     request.body.rewind
     hash = Rack::Utils.parse_nested_query(request.body.read)
     params = JSON.parse hash.to_json 
-    document = Document.new(title: params["title"], type: params["type"], format: ["format"], visibility: true)#format: params["format"])
+    document = Document.new(title: params["title"], type: params["type"], format: params["format"], visibility: true, user_id: session[:user_id])#format: params["format"])
     
     if document.title && document.title != "" && document.type && document.format 
       document.save
@@ -84,15 +80,12 @@ class App < Sinatra::Base
     user = User.find(email: params['email'])
     if user && user.password == params['pwd']
       session[:user_id] = user.id
+      session[:user_name] = user.name
       @current_user = User.find(id: session[:user_id])
       redirect '/'
     else
       redirect '/login'
     end
-  end
-
-  get '/signUp' do
-    erb :signUp
   end
 
 end
