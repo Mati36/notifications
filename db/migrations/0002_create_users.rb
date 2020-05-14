@@ -5,9 +5,10 @@ Sequel.migration do
         add_column :users, :dni,        Integer, null: false 
         add_column :users, :email,      String,  null: false 
         add_column :users, :password,   String,  null: false 
-        add_column :users, :created_at, DateTime    
+        add_column :users, :type,       String,  null: false
+		add_column :users, :created_at, DateTime    
         add_column :users, :updated_at, DateTime
-    
+        set_column_default :users,      :type,  'user'
     end 
 
     down do 
