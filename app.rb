@@ -15,18 +15,19 @@ class App < Sinatra::Base
 
   before do 
     @path = request.path_info
-    logger.info(session[:user_id])
-    logger.info(session[:user_name])
+    #logger.info(session[:user_id])
+    #logger.info(session[:user_name])
     if !session[:user_id] && @path != '/login' && @path != '/signUp'
       redirect '/login'
     elsif session[:user_id]
-      user = User.find(id: session[:user_id])
-      logger.info(user.name);
+      @user = User.find(id: session[:user_id])
+      #logger.info(@user.name);
     end
   end
 
   get "/" do
-    "hola"
+    @user = User.find(id: session[:user_id])
+    "Welcome " + @user.name
   end
 
   post '/signUp' do
@@ -73,7 +74,11 @@ class App < Sinatra::Base
   end
 
   get '/login' do
-    erb :login
+    if(session[:user_id])
+      redirect '/'
+    else
+      erb :login
+    end
   end
 
   post '/login' do
@@ -81,6 +86,8 @@ class App < Sinatra::Base
     if user && user.password == params['pwd']
       session[:user_id] = user.id
       session[:user_name] = user.name
+      session[:user_role] = user.role
+      logger.info(session[:user_role])
       @current_user = User.find(id: session[:user_id])
       redirect '/'
     else
