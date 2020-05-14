@@ -1,8 +1,6 @@
 FROM ruby:2.6.4
 
-RUN apt-get update && \
-  apt-get install -y bash postgresql-client nodejs --no-install-recommends && \
-  rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y bash nodejs --no-install-recommends && rm -rf /var/lib/apt/lists/*
 RUN gem install rerun rb-fsevent
 
 RUN mkdir -p /usr/src/app

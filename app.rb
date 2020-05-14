@@ -1,7 +1,3 @@
-require 'sinatra/base'
-require "sinatra/config_file"
-require './models/user.rb'
-
 class App < Sinatra::Base
   require 'net/http'
   require 'json'
@@ -51,7 +47,7 @@ class App < Sinatra::Base
     request.body.rewind
     hash = Rack::Utils.parse_nested_query(request.body.read)
     params = JSON.parse hash.to_json 
-    document = Document.new(title: params["title"], type: params["type"], format: ["format"])#format: params["format"])
+    #document = Document.new(title: params["title"], type: params["type"], format: ["format"])#format: params["format"])
     
     if document.title && document.title != "" && document.type && document.format 
       document.save
