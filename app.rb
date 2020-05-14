@@ -11,7 +11,18 @@ class App < Sinatra::Base
     set :sessions_fail, '/'
     set :sessions_secret, "inhakiable papuuu"
     set :sessions_fail, true
+    set :no_auth_neededs, ['/login']
   end 
+
+  before do 
+    request.path_info
+    if !session[:user_id]
+      redirect '/login'
+    elsif session[:user_id]
+      @current_user = User.find(id: session[:user_id])
+    end
+  end
+
 
   get "/" do
     "hola"
@@ -40,6 +51,10 @@ class App < Sinatra::Base
   end
 
   get '/save_document' do
+    if sessions[:user.id].present?
+      user = User.find(id: session[:user_id])
+      user.name
+    end  
     erb :save_document
   end
 
@@ -67,10 +82,9 @@ class App < Sinatra::Base
 
   post '/login' do
     user = User.find(email: params['email'])
-    if user.password == params['pwd']
-      sessions[:user.name] = user.name
-      sessions[:user.lastname] = user.lastname      
-      sessions[:user.dni] = user.dni
+    if user && user.password == params['pwd']
+      session[:user_id] = user.id
+      @current_user = User.find(id: session[:user_id])
       redirect '/'
     else
       redirect '/login'
