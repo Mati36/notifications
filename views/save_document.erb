@@ -7,7 +7,7 @@
     </head>
     <body>
         <div class="save_document">
-            <form action="save_document" method="POST">
+            <form action="save_document" method="POST" enctype="multipart/form-data">
                 <label for="title">Titulo</label> 
                 <input type="text" name="title"> <br>
                 <label for="type" >Tipo</label> 
@@ -15,9 +15,10 @@
                     <option value="Act">Acta</option>
                     <option value="Resolution">Resolucion</option>
                 </select>
-                <button type="button" onclick="document.getElementById('fileInput').click();">Examinar...</button> 
-                <input id="fileInput" type="file" accept= ".pdf, .jpg, .jpeg, .png" onChange='getFileExtension()' style="display: none;" /> <br>
-                <input name="format" id="format" />
+                <!--<button type="button" onclick="document.getElementById('fileInput').click();">Examinar...</button> -->
+                <input name="fileInput" type="file" accept= ".pdf, .jpg, .jpeg, .png"  /> <br>
+                <!--<input name="format" id="format" />-->
+                <input type="text" name="path" value ="file.value" class="button" hidden>
                 <input type="submit" value="Subir Documento"> 
             </form>
         </div>

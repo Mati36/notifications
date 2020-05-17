@@ -56,13 +56,15 @@ class App < Sinatra::Base
   end
 
   post '/save_document' do
-    request.body.rewind
-    hash = Rack::Utils.parse_nested_query(request.body.read)
-    params = JSON.parse hash.to_json 
-    document = Document.new(title: params["title"], type: params["type"], format: params["format"], visibility: true, user_id: session[:user_id])#format: params["format"])
-    
-    if document.title && document.title != "" && document.type && document.format 
+   
+    file = params[:fileInput] [:tempfile]
+    @fileFormat = File.extname(file)
+   
+    document = Document.new(title: params["title"], type: params["type"], format:@fileFormat, visibility: true, user_id: session[:user_id])#format: params["format"])
+
+    if document.title && document.title != "" && document.type && document.format && document.format != ""
       document.save
+      cp(file.path, "public/#{@filename}")
       redirect '/'
     else
       redirect '/save_document'
