@@ -58,13 +58,14 @@ class App < Sinatra::Base
   post '/save_document' do
    
     file = params[:fileInput] [:tempfile]
+    @fileName = params["title"]
     @fileFormat = File.extname(file)
    
-    document = Document.new(title: params["title"], type: params["type"], format:@fileFormat, visibility: true, user_id: session[:user_id])#format: params["format"])
+    document = Document.new(title: @fileName, type: params["type"], format:@fileFormat, visibility: true, user_id: session[:user_id])#format: params["format"])
 
     if document.title && document.title != "" && document.type && document.format && document.format != ""
       document.save
-      cp(file.path, "public/#{@filename}")
+      cp(file.path, "public/".concat(@fileName.concat(@fileFormat)))
       redirect '/'
     else
       redirect '/save_document'
