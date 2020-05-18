@@ -16,8 +16,8 @@ Sequel.migration do
         drop_column :users, :dni
         drop_column :users, :email
         drop_column :users, :password
-        drop_column :user,  :role
         drop_column :users, :created_at
         drop_column :users, :updated_at
+    
     end  
 end    
