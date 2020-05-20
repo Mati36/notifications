@@ -66,7 +66,7 @@ class App < Sinatra::Base
       document.save
       @id = Document.last.id
       @localPath = "public/files/#{@id}#{@fileFormat}"
-      document.update(path: @localPath)
+      document.update(path: "/files/#{@id}#{@fileFormat}")
       if !Dir.exist?(@directory)
         logger.info (File.join(@directory))
         Dir.mkdir(@directory)
@@ -111,8 +111,9 @@ class App < Sinatra::Base
     erb :documents
   end
 
-  get '/doc_view/:document:format' do
-    @path = '/public/files/'.concat(params["document"].concat(params["format"]))
+  get '/doc_view/:id' do
+    #@path = '/public/files/'.concat(params["document"].concat(params["format"]))
+    @document = Document.find(id: params[:id])
     erb :doc_view 
   end
 
