@@ -8,7 +8,7 @@
         <div class="documents">
             <ul>
                 <%@documents.each do |document|%> 
-                    <li>  <a href = '/doc_view/<%= document.id%>'>  <%= document.title%> </a> </li> 
+                    <li> <a href = '/doc_view/<%= document.id%>' target="_blank" > <%= document.title%> </a> </li> 
                 <%end%>
             </ul>
          </div>

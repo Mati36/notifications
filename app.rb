@@ -26,8 +26,8 @@ class App < Sinatra::Base
   end
 
   get "/" do
-    @user = User.find(id: session[:user_id])
-    "Welcome " + @user.name
+    #@user = User.find(id: session[:user_id])
+    erb :index
   end
 
   post '/signUp' do
@@ -49,6 +49,13 @@ class App < Sinatra::Base
       session.clear
     end
     erb :signUp
+  end
+
+  get '/log_out' do
+    if session[:user_id]
+      session.clear
+    end
+    redirect '/'
   end
 
   get '/save_document' do 
