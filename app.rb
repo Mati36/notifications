@@ -61,11 +61,12 @@ class App < Sinatra::Base
     @fileName = params["title"]
     @fileFormat = File.extname(file)
     @directory = "public/files/"
-    @localPath = "public/files/".concat(@fileName.concat(@fileFormat))
-    document = Document.new(title: @fileName, type: params["type"], format:@fileFormat, visibility: true, user_id: session[:user_id])#format: params["format"])
-
-    if document.title && document.title != "" && document.type && document.format && document.format != ""
+    document = Document.new(title: @fileName, type: params["type"], format:@fileFormat, visibility: true, user_id: session[:user_id], path: "")
+    if document.title && document.title != "" && document.type && document.format && document.format != "" && document.path
       document.save
+      @id = Document.last.id
+      @localPath = "public/files/#{@id}#{@fileFormat}"
+      document.update(path: @localPath)
       if !Dir.exist?(@directory)
         logger.info (File.join(@directory))
         Dir.mkdir(@directory)
@@ -103,6 +104,16 @@ class App < Sinatra::Base
     else
       redirect '/login'
     end
+  end
+
+  get '/documents' do
+    @documents = Document
+    erb :documents
+  end
+
+  get '/doc_view/:document:format' do
+    @path = '/public/files/'.concat(params["document"].concat(params["format"]))
+    erb :doc_view 
   end
 
 end

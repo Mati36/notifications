@@ -6,9 +6,11 @@ Sequel.migration do
       String          :type,          null: false 
       String          :format,        null: false 
       TrueClass       :visibility,    null: false 
+      String          :path,          null: false
       foreign_key     :user_id,       :users 
       DateTime        :created_at 
       DateTime        :updated_at
+      
     end 
   end                                                                                                          
   
