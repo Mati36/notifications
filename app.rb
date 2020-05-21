@@ -3,6 +3,7 @@ class App < Sinatra::Base
   require 'json'
   require 'sinatra'
   require './models/init.rb'
+  require 'date'
   include FileUtils::Verbose
 
   configure do 
@@ -70,7 +71,7 @@ class App < Sinatra::Base
       @fileName = params["title"]
       @fileFormat = File.extname(file)
       @directory = "public/files/"
-      document = Document.new(title: @fileName, type: params["type"], format:@fileFormat, visibility: true, user_id: session[:user_id], path: "")
+      document = Document.new(title: @fileName, type: params["type"], format:@fileFormat, visibility: true, user_id: session[:user_id], path: "", created_at: params["date"])
       if document.title && document.title != "" && document.type && document.format && document.format != "" && document.path
         document.save
         @id = Document.last.id
