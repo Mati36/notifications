@@ -1,5 +1,6 @@
 
 class Document < Sequel::Model
+  plugin :validation_helpers
   def validate
     super
     validates_presence [:title, :type, :format, :visibility, :path, :created_at], message: 'Datos en blancos o vacios'
