@@ -35,16 +35,16 @@ class App < Sinatra::Base
     request.body.rewind 
     hash = Rack::Utils.parse_nested_query(request.body.read)
     params = JSON.parse hash.to_json 
-    if params['name'] && params['lastname'] && params['dni'] && params['email'] && params['pwd']
-      user = User.new(name: params['name'], lastname: params['lastname'], dni: params['dni'], email: params['email'],password: params['pwd'] )
+    #if params['name'] && params['lastname'] && params['dni'] && params['email'] && params['pwd']
+    user = User.new(name: params['name'], lastname: params['lastname'], dni: params['dni'], email: params['email'],password: params['pwd'] )
     
-      if user.save
-        redirect '/login'
-        #user.last
-      else
-        [401,{},"No se guardo el usuario"]
-      end 
-    end
+    if user.save
+      redirect '/login'
+      #user.last
+    else
+      [401,{},"No se guardo el usuario"]
+    end 
+    #end
   end
 
   get '/signUp' do
@@ -69,25 +69,28 @@ class App < Sinatra::Base
     if(params[:fileInput])
       file = params[:fileInput] [:tempfile]
       @fileName = params["title"]
+      @fileType = params["type"]
       @fileFormat = File.extname(file)
       @directory = "public/files/"
-      document = Document.new(title: @fileName, type: params["type"], format:@fileFormat, visibility: true, user_id: session[:user_id], path: "", created_at: params["date"])
-      if document.title && document.title != "" && document.type && document.format && document.format != "" && document.path
-        document.save
-        @id = Document.last.id
-        @localPath = "#{@directory}#{@id}#{@fileFormat}"
-        document.update(path: "/files/#{@id}#{@fileFormat}")
-        if !Dir.exist?(@directory)
-          logger.info (File.join(@directory))
-          Dir.mkdir(@directory)
-          File.chmod(0777, @directory)
-        end
-        cp(file.path, @localPath)
-        File.chmod(0777, @localPath)
-        redirect '/'
-      else
-        redirect '/save_document'
-      end 
+      @date = DateTime.now.strftime("%m/%d/%Y/%T")
+      
+      
+      document = Document.new(title: @fileName, type: params["type"], format:@fileFormat, visibility: true, user_id: session[:user_id], path:"", created_at: @date)
+      document.save
+      @id = Document.last.id
+      @localPath = "#{@directory}#{@id}#{@fileFormat}"
+      document.update(path: "/files/#{@id}#{@fileFormat}")
+      
+      if !Dir.exist?(@directory)
+        logger.info (File.join(@directory))
+        Dir.mkdir(@directory)
+        File.chmod(0777, @directory)
+      end
+      
+      cp(file.path, @localPath)
+      File.chmod(0777, @localPath)
+      redirect '/'
+    
     else
       redirect '/save_document'
     end 
@@ -125,8 +128,7 @@ class App < Sinatra::Base
   end
 
   get '/doc_view/:id' do
-    #@path = '/public/files/'.concat(params["document"].concat(params["format"]))
-    @document = Document.find(id: params[:id])
+    document = Document.find(id: params[:id])
     erb :doc_view 
   end
 
