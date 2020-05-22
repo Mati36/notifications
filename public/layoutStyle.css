@@ -1,0 +1,46 @@
+h4{
+  color: black;
+}
+
+.canvas{
+  height: 100vh;
+  width: 100vw;
+}
+
+.header{
+  background-color: steelblue;
+  height: 8%;
+  border-bottom: 2px solid gray;
+  /*opacity: 0.6;*/ 
+}
+
+.row{
+  height: 92%;
+}
+
+.offset{
+  background: linear-gradient(180deg, rgba(152, 194, 202,1) 35%,  rgba(200,200,255,1) 100%);  float: left;
+  width: 2%;
+  height: 100%;
+}
+
+.menu {
+  background: linear-gradient(180deg, rgba(152, 194, 202,1) 35%,  rgba(200,200,255,1) 100%);  float: left;
+  width: 18%;
+  height: 100%;
+  border-right: 2px solid gray;
+}
+
+.viewDocs{
+  height: 1%;
+  border-bottom: 1px grey;
+}
+
+.space {
+  width: 2%;
+}
+
+.site {
+  float: left;
+  width: 78%;
+}

@@ -3,7 +3,6 @@ class App < Sinatra::Base
   require 'json'
   require 'sinatra'
   require './models/init.rb'
-  require 'date'
   include FileUtils::Verbose
 
   configure do 
@@ -72,6 +71,7 @@ class App < Sinatra::Base
       @fileType = params["type"]
       @fileFormat = File.extname(file)
       @directory = "public/files/"
+<<<<<<< Updated upstream
       @date = DateTime.now.strftime("%m/%d/%Y/%T")
       
       
@@ -91,6 +91,25 @@ class App < Sinatra::Base
       File.chmod(0777, @localPath)
       redirect '/'
     
+=======
+      document = Document.new(title: @fileName, type: params["type"], format:@fileFormat, visibility: true, user_id: session[:user_id], path: "")
+      if document.title && document.title != "" && document.type && document.format && document.format != "" && document.path
+        document.save
+        @id = Document.last.id
+        @localPath = "#{@directory}#{@id}#{@fileFormat}"
+        document.update(path: "/files/#{@id}#{@fileFormat}")
+        if !Dir.exist?(@directory)
+          logger.info (File.join(@directory))
+          Dir.mkdir(@directory)
+          File.chmod(0777, @directory)
+        end
+        cp(file.path, @localPath)
+        File.chmod(0777, @localPath)
+        redirect '/'
+      else
+        redirect '/save_document'
+      end 
+>>>>>>> Stashed changes
     else
       redirect '/save_document'
     end 
