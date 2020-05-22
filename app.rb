@@ -131,8 +131,8 @@ class App < Sinatra::Base
   end
 
   get '/doc_view/:id' do
-    document = Document.find(id: params[:id])
-    erb :doc_view 
+    @document = Document.find(id: params[:id])
+    erb :doc_view, :layout => false 
   end
 
 end
