@@ -15,11 +15,15 @@ class App < Sinatra::Base
   end 
 
   before do 
+    @session_user = session[:user_id]
     @path = request.path_info
-    if !session[:user_id] && @path != '/login' && @path != '/signUp'
+    if !@session_user && @path != '/login' && @path != '/signUp'
       redirect '/login'
-    elsif session[:user_id]
-      @user = User.find(id: session[:user_id])
+    elsif @session_user
+      @user = User.find(id: @session_user)
+      if (!@user.is_admin && @path == '/save_document')
+        redirect '/'
+      end  
     end
   end
 
@@ -50,14 +54,14 @@ class App < Sinatra::Base
   end
 
   get '/signUp' do
-    if session[:user_id]
+    if @session_user
       session.clear
     end
     erb :signUp
   end
 
   get '/log_out' do
-    if session[:user_id]
+    if @session_user
       session.clear
     end
     redirect '/'
@@ -105,7 +109,7 @@ class App < Sinatra::Base
   end
 
   get '/login' do
-    if(session[:user_id])
+    if(@session_user)
       redirect '/'
     else
       erb :login
@@ -114,12 +118,11 @@ class App < Sinatra::Base
 
   post '/login' do
     user = User.find(email: params['email'])
+    
     if user && user.password == params['pwd']
       session[:user_id] = user.id
       session[:user_name] = user.name
       session[:user_is_admin] = user.is_admin
-      logger.info(session[:user_is_admin])
-      @current_user = User.find(id: session[:user_id])
       redirect '/'
     else
       redirect '/login'
@@ -127,7 +130,7 @@ class App < Sinatra::Base
   end
 
   get '/documents' do
-    @documents = Document
+    @documents = Document.order(:created_at).reverse
     erb :documents
   end
 
@@ -135,6 +138,18 @@ class App < Sinatra::Base
     @document = Document.find(id: params[:id])
     erb :doc_view, :layout => false 
   end
+
+  get '/my_upload_documents' do
+    @documents = Document.where(user_id: @session_user).order(:created_at).reverse
+    erb :documents
+  end
+
+  get '/my_tags' do 
+    #documentos en donde el user esta taggeado
+
+  end  
+
+  
 
 end
 
