@@ -21,7 +21,7 @@ class App < Sinatra::Base
       redirect '/login'
     elsif @session_user
       @user = User.find(id: @session_user)
-      if (!@user.is_admin && @path == '/save_document' && '/change_role')
+      if (!@user.is_admin && (@path == '/save_document' || @path == '/change_role'))
         redirect '/'
       end  
     end
