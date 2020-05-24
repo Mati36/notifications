@@ -16,18 +16,14 @@ class App < Sinatra::Base
 
   before do 
     @path = request.path_info
-    #logger.info(session[:user_id])
-    #logger.info(session[:user_name])
     if !session[:user_id] && @path != '/login' && @path != '/signUp'
       redirect '/login'
     elsif session[:user_id]
       @user = User.find(id: session[:user_id])
-      #logger.info(@user.name);
     end
   end
 
   get "/" do
-    #@user = User.find(id: session[:user_id])
     erb :index
   end
 
@@ -35,17 +31,22 @@ class App < Sinatra::Base
     request.body.rewind 
     hash = Rack::Utils.parse_nested_query(request.body.read)
     params = JSON.parse hash.to_json 
-    @created_date = DateTime.now.strftime("%m/%d/%Y: %T")
-    user = User.new(name: params['name'], lastname: params['lastname'], dni: params['dni'], email: params['email'],password: params['pwd'],created_at: @created_date)  
-   
+    #@created_date = DateTime.now.strftime("%m/%d/%Y: %T")
+    @created_date = DateTime.now.strftime('%Y-%m-%dT%H:%M:%S%z')
+    user = User.new(name: params['name'], lastname: params['lastname'], dni: params['dni'], email: params['email'],password: params['pwd'], is_admin:false ,created_at: @created_date)  
+    
     if user.valid? 
+      if User.all.length == 0
+        user.update(is_admin: true)
+      end 
+
       user.save
       redirect '/login'
-      #user.last
+      
     else
       [401,{},"Usuario no registrado"]
     end 
-    #end
+    
   end
 
   get '/signUp' do
@@ -116,8 +117,8 @@ class App < Sinatra::Base
     if user && user.password == params['pwd']
       session[:user_id] = user.id
       session[:user_name] = user.name
-      session[:user_role] = user.role
-      logger.info(session[:user_role])
+      session[:user_is_admin] = user.is_admin
+      logger.info(session[:user_is_admin])
       @current_user = User.find(id: session[:user_id])
       redirect '/'
     else
