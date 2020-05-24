@@ -21,7 +21,7 @@ class App < Sinatra::Base
       redirect '/login'
     elsif @session_user
       @user = User.find(id: @session_user)
-      if (!@user.is_admin && @path == '/save_document')
+      if (!@user.is_admin && @path == '/save_document' && '/change_role')
         redirect '/'
       end  
     end
@@ -148,6 +148,20 @@ class App < Sinatra::Base
     #documentos en donde el user esta taggeado
 
   end  
+
+  get '/change_role' do 
+    erb :change_role
+  end
+
+  post '/change_role' do
+    if @user = User.find(dni: params['tag'])
+      @date = DateTime.now.strftime("%m/%d/%Y: %T")
+      @user.update(is_admin: true, updated_at: @date)
+      redirect '/'
+    else 
+      redirect '/change_role'  
+    end  
+  end   
 
   
 
