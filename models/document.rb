@@ -8,5 +8,8 @@ class Document < Sequel::Model
   end
   
   #Relations
-  many_to_one :user
+  one_to_many :documents_users
+  many_to_many :users #por esto no sube
+  # many_to_one :user
+  
 end

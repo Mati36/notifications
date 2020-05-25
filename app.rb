@@ -15,12 +15,12 @@ class App < Sinatra::Base
   end 
 
   before do 
-    @session_user = session[:user_id]
+    @session_user_id = session[:user_id]
     @path = request.path_info
-    if !@session_user && @path != '/login' && @path != '/signUp'
+    if !@session_user_id && @path != '/login' && @path != '/signUp'
       redirect '/login'
-    elsif @session_user
-      @user = User.find(id: @session_user)
+    elsif @session_user_id
+      @user = User.find(id: @session_user_id)
       if (!@user.is_admin && (@path == '/save_document' || @path == '/change_role'))
         redirect '/'
       end  
@@ -35,16 +35,15 @@ class App < Sinatra::Base
     request.body.rewind 
     hash = Rack::Utils.parse_nested_query(request.body.read)
     params = JSON.parse hash.to_json 
-    #@created_date = DateTime.now.strftime("%m/%d/%Y: %T")
-    @created_date = DateTime.now.strftime('%Y-%m-%dT%H:%M:%S%z')
-    user = User.new(name: params['name'], lastname: params['lastname'], dni: params['dni'], email: params['email'],password: params['pwd'], is_admin:false ,created_at: @created_date)  
+    user = User.new(name: params['name'], lastname: params['lastname'], dni: params['dni'], email: params['email'],password: params['pwd'], is_admin:false ,created_at: date_time)  
     
     if user.valid? 
       if User.all.length == 0
         user.update(is_admin: true)
       end 
-
       user.save
+      User.order(user.id)
+
       redirect '/login'
       
     else
@@ -54,14 +53,14 @@ class App < Sinatra::Base
   end
 
   get '/signUp' do
-    if @session_user
+    if @session_user_id
       session.clear
     end
     erb :signUp
   end
 
   get '/log_out' do
-    if @session_user
+    if @session_user_id
       session.clear
     end
     redirect '/'
@@ -76,15 +75,17 @@ class App < Sinatra::Base
       file = params[:fileInput] [:tempfile]
       @fileFormat = File.extname(file)
       @directory = "public/files/"
-      @date = DateTime.now.strftime("%m/%d/%Y: %T")
+      @directory_temp = "#{date_time}"
       
-      document = Document.new(title: params["title"], type: params["type"], format:@fileFormat, visibility: true, user_id: session[:user_id], path:"temp", created_at: @date)
-        
+      document = Document.new(title: params["title"], type: params["type"], format:@fileFormat, visibility: true, user_id: session[:user_id], path:@directory_temp, created_at: date_time)
+     
       if document.valid?
         document.save
         @id = Document.last.id
         @localPath = "#{@directory}#{@id}#{@fileFormat}"
         document.update(path: "/files/#{@id}#{@fileFormat}")
+        
+        tags_user(params["tag"],document)
         
         if !Dir.exist?(@directory)
           Dir.mkdir(@directory)
@@ -109,7 +110,7 @@ class App < Sinatra::Base
   end
 
   get '/login' do
-    if(@session_user)
+    if(@session_user_id)
       redirect '/'
     else
       erb :login
@@ -140,7 +141,7 @@ class App < Sinatra::Base
   end
 
   get '/my_upload_documents' do
-    @documents = Document.where(user_id: @session_user).order(:created_at).reverse
+    @documents = Document.where(user_id: @session_user_id).order(:created_at).reverse
     erb :documents
   end
 
@@ -155,15 +156,31 @@ class App < Sinatra::Base
 
   post '/change_role' do
     if @user = User.find(dni: params['tag'])
-      @date = DateTime.now.strftime("%m/%d/%Y: %T")
-      @user.update(is_admin: true, updated_at: @date)
+      @user.update(is_admin: true, updated_at: date_time)
       redirect '/'
     else 
       redirect '/change_role'  
     end  
   end   
 
-  
+ # metodos 
+
+  def date_time 
+   return DateTime.now.strftime("%m/%d/%Y: %T")
+  end  
+
+  def tags_user(tags_user, document) 
+    
+    users = tags_user.split('@')
+    logger.info(users)
+    users.each do |user_dni|
+      
+      if !user_dni.empty?
+        user = User.find(dni: user_dni)
+        user.add_document(document) 
+      end  
+    end
+  end  
 
 end
 
