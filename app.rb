@@ -176,6 +176,28 @@ class App < Sinatra::Base
     end  
   end   
 
+  get '/profile' do 
+    @user =User.find(id: @session_user_id)
+    erb :profile
+  end  
+
+  get '/edit_profile' do
+    @user =User.find(id: @session_user_id) 
+    erb :edit_profile
+  end  
+
+  post '/edit_profile' do
+    @user =User.find(id: @session_user_id)
+    if params["name"] == '' || params["lastname"] == '' || params["email"] == ''
+      redirect '/edit_profile'
+    else
+      @user.update(name: params["name"], lastname: params["lastname"], email: params["email"], updated_at: date_time)
+      redirect '/' 
+    end  
+  end  
+
+
+
  # metodos 
 
   def date_time 
