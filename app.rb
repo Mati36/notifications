@@ -141,8 +141,17 @@ class App < Sinatra::Base
 
   get '/my_upload_documents' do
     @documents = Document.where(user_id: @session_user_id).order(:created_at).reverse
+    
     @user =User.find(id: @session_user_id)
     erb :documents
+  end
+
+  get '/delete_doc/:document' do
+    if params[:document] != nil
+      delete_doc(Document.find(id: params[:document]))
+      
+    end  
+   redirect '/my_upload_documents'
   end
 
   get '/my_tags' do 
@@ -184,6 +193,12 @@ class App < Sinatra::Base
         user.add_document(document) 
       end  
     end
+  end  
+
+  def delete_doc(document)
+     if document
+      document.update(visibility: false)  
+     end 
   end  
 
 end

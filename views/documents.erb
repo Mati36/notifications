@@ -3,15 +3,34 @@
     <head>
         <meta charset = "utf-8">
         <title>document</title>
+        
     </head>
     <body>
         <div class="documents">
-            <ul>
-                <%@documents.each do |document|%> 
-                    <li> <a href = '/doc_view/<%= document.id%>' target="_blank" > <%= document.title%> </a> </li> 
-                <%end%>
-            </ul>
-         </div>
-    </body>
+           <table>
+                <tr>
+                  <th>Titulo</th>
+                    <% if @user.is_admin %>
+                        <th></th>
+                        <th></th>
+                    <% end %> 
+                </tr>
 
+                <%@documents.each do |document|%> 
+                  
+                  <tr>  
+                  <% if document.visibility %>   
+                        <th><a href = '/doc_view/<%= document.id%>' target="_blank" > <%= document.title%></a></th>
+                        <% if @user.is_admin %>   
+                            <th><a name ="delete" href = '/delete_doc/<%=document.id%>'>Eliminar</a></th>
+                        <% end %>  
+                    <% end %>  
+                    </tr>       
+                <%end%>
+            </table>
+        </div>
+    </body>
+    
 </html>
+
+
