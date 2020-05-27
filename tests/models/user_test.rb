@@ -53,4 +53,8 @@ class UserTest < MiniTest::Unit::TestCase
     assert_equal (@user.dni.is_a? Numeric), false
   end  
 
+  def test_email_format
+    @user = User.new(name: 'Facundo', lastname: 'Fernandez', dni: 41593885, email: 'ffgmail.com', password: '123')
+    assert_equal @user.valid?, false
+  end  
 end 
