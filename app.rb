@@ -49,7 +49,6 @@ class App < Sinatra::Base
     else
       [401,{},"Usuario no registrado"]
     end 
-    
   end
 
   get '/signUp' do
@@ -142,12 +141,12 @@ class App < Sinatra::Base
 
   get '/my_upload_documents' do
     @documents = Document.where(user_id: @session_user_id).order(:created_at).reverse
+    @user =User.find(id: @session_user_id)
     erb :documents
   end
 
   get '/my_tags' do 
     #documentos en donde el user esta taggeado
-
   end  
 
   get '/change_role' do 
@@ -155,9 +154,14 @@ class App < Sinatra::Base
   end
 
   post '/change_role' do
-    if @user = User.find(dni: params['tag'])
-      @user.update(is_admin: true, updated_at: date_time)
-      redirect '/'
+    @user = User.find(dni: params['tag'])
+    if @user && @session_user_id != @user.id 
+      if @user.is_admin && User.where(is_admin: true).all.length > 1
+        @user.update(is_admin: false, updated_at: date_time)
+      else
+        @user.update(is_admin: true, updated_at: date_time)
+      end
+        redirect '/'
     else 
       redirect '/change_role'  
     end  
