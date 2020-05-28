@@ -155,7 +155,8 @@ class App < Sinatra::Base
   end
 
   get '/my_tags' do 
-    #documentos en donde el user esta taggeado
+    @documents = Document.join(Tag.where(user_id: @session_user_id),document_id: :id)
+    erb :documents
   end  
 
   get '/change_role' do 
@@ -163,7 +164,17 @@ class App < Sinatra::Base
   end
 
   post '/change_role' do
-    @user = User.find(dni: params['tag'])
+    user_tag = params['tag'].split('@').reject { |user| user.empty? }.first
+       
+
+    if user_tag.oct == 0
+      logger.info(user_tag) 
+      @user = User.find(email: user_tag)
+      logger.info(@user != nil) 
+    elsif user_tag.length >= 8 
+      @user = User.find(dni: user_tag.to_i)
+    end
+    
     if @user && @session_user_id != @user.id 
       if @user.is_admin && User.where(is_admin: true).all.length > 1
         @user.update(is_admin: false, updated_at: date_time)
@@ -196,8 +207,6 @@ class App < Sinatra::Base
     end  
   end  
 
-
-
  # metodos 
 
   def date_time 
@@ -205,11 +214,9 @@ class App < Sinatra::Base
   end  
 
   def tags_user(tags_user, document) 
-    
     users = tags_user.split('@')
-    logger.info(users)
     users.each do |user_dni|
-      
+     
       if !user_dni.empty?
         user = User.find(dni: user_dni)
         user.add_document(document) 
