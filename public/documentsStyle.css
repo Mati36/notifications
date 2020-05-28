@@ -1,0 +1,19 @@
+#docs {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    background-color: #ddd;
+  }
+  
+  #docs td {
+    border-bottom: 1px solid black;
+    padding: 8px;
+  }
+  
+  #docs th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: rgb(60, 115, 218);
+    color: white;
+  }
