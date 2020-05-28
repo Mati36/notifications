@@ -196,8 +196,12 @@ class App < Sinatra::Base
     if params["name"].empty? || params["lastname"].empty? || params["email"].empty?
       redirect '/edit_profile'
     else
-      @current_user.update(name: params["name"], lastname: params["lastname"], email: params["email"], updated_at: date_time)
-      redirect '/' 
+      if (params["password"] == @current_user.password)
+        @current_user.update(name: params["name"], lastname: params["lastname"], email: params["email"], updated_at: date_time)
+        redirect '/profile' 
+      else
+        redirect '/edit_profile'
+      end
     end  
   end  
 
