@@ -156,7 +156,7 @@ class App < Sinatra::Base
     erb :documents
   end  
 
-  get '/change_role/:action' do 
+  get '/change_role' do 
     erb :change_role
   end
 
