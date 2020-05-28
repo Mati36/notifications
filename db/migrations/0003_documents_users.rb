@@ -5,6 +5,9 @@ Sequel.migration do
 			foreign_key 	:user_id, 		:users, 		null: false
 			primary_key 	[:document_id, 	:user_id]
 			index 			[:document_id, 	:user_id]
+			TrueClass       :checked,    					:default => false
+			TrueClass       :favorite,    					:default => false
+			TrueClass       :tag,    						:default => false
 		end
 	end
 	 down do

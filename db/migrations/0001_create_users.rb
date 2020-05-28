@@ -7,7 +7,8 @@ Sequel.migration do
       Integer       :dni,         null: false 
       String        :email,       null: false 
       String        :password,    null: false 
-      FalseClass    :is_admin,    null: false
+      FalseClass    :is_admin,    :default => false
+      String        :avatar_path, :default => '/images/avatars/default.png'
       DateTime      :created_at     
       DateTime      :updated_at 
     end

@@ -36,7 +36,7 @@ class App < Sinatra::Base
     request.body.rewind 
     hash = Rack::Utils.parse_nested_query(request.body.read)
     params = JSON.parse hash.to_json 
-    user = User.new(name: params['name'], lastname: params['lastname'], dni: params['dni'], email: params['email'],password: params['pwd'], is_admin:false ,created_at: date_time)  
+    user = User.new(name: params['name'], lastname: params['lastname'], dni: params['dni'], email: params['email'],password: params['pwd'],created_at: date_time)  
     
     if user.valid? 
       if User.all.length == 0
@@ -53,7 +53,7 @@ class App < Sinatra::Base
   end
 
   get '/signUp' do
-    if @current_user.id
+    if @current_user
       session.clear
     end
     erb :signUp
@@ -218,7 +218,8 @@ class App < Sinatra::Base
      
       if !user_dni.empty?
         user = find_user_dni(user_dni)
-        user.add_document(document) 
+        user.add_document(document)
+        Tag.last.update(tag: true) 
       end  
     end
   end  
