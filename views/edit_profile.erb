@@ -9,11 +9,11 @@
             <form action="/edit_profile" method="POST">
                 Editar Perfil <br>
                 <label for="name">nombre</label>
-                <input type="text" name="name" value= <%=@user.name%>  / data-validation="alphanumeric" > <br>
+                <input type="text" name="name" value= <%=@current_user.name%>  / data-validation="alphanumeric" > <br>
                 <label for="lastname">Apellido</label> 
-                <input type="text" name="lastname" value= <%=@user.lastname%> / data-validation="alphanumeric" > <br>
+                <input type="text" name="lastname" value= <%=@current_user.lastname%> / data-validation="alphanumeric" > <br>
                 <label for="email">Email</label> 
-                <input type="text" name="email" value= <%=@user.email%> / data-validation="email" > <br>   
+                <input type="text" name="email" value= <%=@current_user.email%> / data-validation="email" > <br>   
                 <input type="submit" value="Aceptar">  
             </form>   
         </div>

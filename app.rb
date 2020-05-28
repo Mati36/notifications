@@ -15,16 +15,17 @@ class App < Sinatra::Base
   end 
 
   before do 
-    @session_user_id = session[:user_id]
+    @current_user = session[:current_user]
     @path = request.path_info
-    if !@session_user_id && @path != '/login' && @path != '/signUp'
+  
+    if !@current_user && @path != '/login' && @path != '/signUp'
       redirect '/login'
-    elsif @session_user_id
-      @user = User.find(id: @session_user_id)
-      if (!@user.is_admin && (@path == '/save_document' || @path == '/change_role'))
+    elsif @current_user
+      if (!@current_user.is_admin && (@path == '/save_document' || @path == '/change_role'))
         redirect '/'
       end  
     end
+    
   end
 
   get "/" do
@@ -52,14 +53,14 @@ class App < Sinatra::Base
   end
 
   get '/signUp' do
-    if @session_user_id
+    if @current_user.id
       session.clear
     end
     erb :signUp
   end
 
   get '/log_out' do
-    if @session_user_id
+    if @current_user.id
       session.clear
     end
     redirect '/'
@@ -70,13 +71,14 @@ class App < Sinatra::Base
   end
 
   post '/save_document' do
+    
     if(params[:fileInput])
       file = params[:fileInput] [:tempfile]
       @fileFormat = File.extname(file)
       @directory = "public/files/"
       @directory_temp = "#{date_time}"
       
-      document = Document.new(title: params["title"], type: params["type"], format:@fileFormat, visibility: true, user_id: session[:user_id], path:@directory_temp, created_at: date_time)
+      document = Document.new(title: params["title"], type: params["type"], format:@fileFormat, visibility: true, user_id: @current_user.id, path:@directory_temp, created_at: date_time)
      
       if document.valid?
         document.save
@@ -85,12 +87,8 @@ class App < Sinatra::Base
         document.update(path: "/files/#{@id}#{@fileFormat}")
         
         tags_user(params["tag"],document)
-        
-        if !Dir.exist?(@directory)
-          Dir.mkdir(@directory)
-          File.chmod(0777, @directory)
-        end
-        
+        dir_create(@directory)
+       
         cp(file.path, @localPath)
         File.chmod(0777, @localPath)
         redirect '/'
@@ -109,7 +107,7 @@ class App < Sinatra::Base
   end
 
   get '/login' do
-    if(@session_user_id)
+    if(@current_user)
       redirect '/'
     else
       erb :login
@@ -117,12 +115,10 @@ class App < Sinatra::Base
   end
 
   post '/login' do
-    user = User.find(email: params['email'])
+    user = find_user_email(params['email'])
     
     if user && user.password == params['pwd']
-      session[:user_id] = user.id
-      session[:user_name] = user.name
-      session[:user_is_admin] = user.is_admin
+      session[:current_user] = user
       redirect '/'
     else
       redirect '/login'
@@ -131,6 +127,7 @@ class App < Sinatra::Base
 
   get '/documents' do
     @documents = Document.order(:created_at).reverse
+    @user = find_user_id(@current_user.id)
     erb :documents
   end
 
@@ -140,9 +137,9 @@ class App < Sinatra::Base
   end
 
   get '/my_upload_documents' do
-    @documents = Document.where(user_id: @session_user_id).order(:created_at).reverse
+    @documents = Document.where(user_id: @current_user.id).order(:created_at).reverse
     
-    @user =User.find(id: @session_user_id)
+    @user = find_user_id(@current_user.id)
     erb :documents
   end
 
@@ -155,27 +152,24 @@ class App < Sinatra::Base
   end
 
   get '/my_tags' do 
-    @documents = Document.join(Tag.where(user_id: @session_user_id),document_id: :id)
+    @documents = Document.join(Tag.where(user_id: @current_user.id),document_id: :id)
     erb :documents
   end  
 
-  get '/change_role' do 
+  get '/change_role/:action' do 
     erb :change_role
   end
 
   post '/change_role' do
     user_tag = params['tag'].split('@').reject { |user| user.empty? }.first
-       
-
     if user_tag.oct == 0
-      logger.info(user_tag) 
-      @user = User.find(email: user_tag)
+      @user = find_user_email(user_tag)
       logger.info(@user != nil) 
     elsif user_tag.length >= 8 
-      @user = User.find(dni: user_tag.to_i)
+      @user =  find_user_dni(user_tag.to_i)
     end
-    
-    if @user && @session_user_id != @user.id 
+    #creo que el error es cuando agregas uno que ta esta
+    if @user && @current_user.id != @user.id 
       if @user.is_admin && User.where(is_admin: true).all.length > 1
         @user.update(is_admin: false, updated_at: date_time)
       else
@@ -188,21 +182,18 @@ class App < Sinatra::Base
   end   
 
   get '/profile' do 
-    @user =User.find(id: @session_user_id)
     erb :profile
   end  
 
   get '/edit_profile' do
-    @user =User.find(id: @session_user_id) 
     erb :edit_profile
   end  
 
   post '/edit_profile' do
-    @user =User.find(id: @session_user_id)
-    if params["name"] == '' || params["lastname"] == '' || params["email"] == ''
+    if params["name"].empty? || params["lastname"].empty? || params["email"].empty?
       redirect '/edit_profile'
     else
-      @user.update(name: params["name"], lastname: params["lastname"], email: params["email"], updated_at: date_time)
+      @current_user.update(name: params["name"], lastname: params["lastname"], email: params["email"], updated_at: date_time)
       redirect '/' 
     end  
   end  
@@ -212,13 +203,14 @@ class App < Sinatra::Base
   def date_time 
    return DateTime.now.strftime("%m/%d/%Y: %T")
   end  
-
+ 
+  # este mertodo taggea a los usuarios con el documento
   def tags_user(tags_user, document) 
     users = tags_user.split('@')
     users.each do |user_dni|
      
       if !user_dni.empty?
-        user = User.find(dni: user_dni)
+        user = find_user_dni(user_dni)
         user.add_document(document) 
       end  
     end
@@ -230,5 +222,27 @@ class App < Sinatra::Base
      end 
   end  
 
+  def find_user_id(current_id)
+    return User.find(id: current_id)
+  end  
+  
+  def find_user_dni(current_dni)
+    return User.find(dni: current_dni)
+  end 
+
+  def find_user_email(current_email)
+    return User.find(email: current_email)
+  end 
+
+  def dir_create(directory)
+    if !Dir.exist?(directory)
+      Dir.mkdir(directory)
+      File.chmod(0777, directory)
+    end
+  end  
+  
+  def consola(ms,var)
+    logger.info("#{ms} #{var}")
+  end  
 end
 

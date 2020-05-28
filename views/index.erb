@@ -5,9 +5,9 @@
         <title>login</title>
     </head>
     <body>
-       <h3> Hola <%= "#{@user.name} #{@user.lastname}"%> </h3>
+       <h3> Hola <%= "#{@current_user.name} #{@current_user.lastname}"%> </h3>
        <ul>
-            <% if(@user.is_admin) %>
+            <% if(@current_user.is_admin) %>
                 <li> <a href ="save_document"> Subir documento</a> </li> 
                 <li> <a href ="my_upload_documents"> Mis documentos subidos</a> </li> 
                 <li> <a name="add_admin" href ="/change_role"> Hacer administrador</a> </li>

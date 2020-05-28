@@ -8,9 +8,9 @@
     </head>
     <body>
         <div class="info">
-            <h1> <%=@user.name%> <%=@user.lastname%> </h1>
-            <h2>DNI: <%=@user.dni%> </h2>
-            <h2>Correo Electronico: <%=@user.email%> </h2> <br> <br>
+            <h1> <%=@current_user.name%> <%=@current_user.lastname%> </h1>
+            <h2>DNI: <%=@current_user.dni%> </h2>
+            <h2>Correo Electronico: <%=@current_user.email%> </h2> <br> <br>
         </div>
         <div class="buttonSpace">
             <form action="/edit_profile" method="GET">
