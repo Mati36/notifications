@@ -10,8 +10,8 @@
             <% if(@current_user.is_admin) %>
                 <li> <a href ="save_document"> Subir documento</a> </li> 
                 <li> <a href ="my_upload_documents"> Mis documentos subidos</a> </li> 
-                <li> <a name="add_admin" href ="/change_role"> Hacer administrador</a> </li>
-                <li> <a name="delete_admin" href ="/change_role"> Eliminar Administrador</a> </li>
+                <li> <a name="add_admin" href ="/change_role/add_admin"> Hacer administrador</a> </li>
+                <li> <a name="delete_admin" href ="/change_role/delete_admin"> Eliminar Administrador</a> </li>
                 <li> <a name="profile" href ="/profile"> Perfil</a> </li>
                 <li> <a name="my_tags" href ="/my_tags"> Documentos Etiquetados</a> </li>
             <%end%>

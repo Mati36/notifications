@@ -156,11 +156,14 @@ class App < Sinatra::Base
     erb :documents
   end  
 
-  get '/change_role' do 
-    erb :change_role
+  get '/change_role/:action' do 
+    @act = params[:action]
+    erb :change_role 
   end
 
-  post '/change_role' do
+  post '/change_role/:action' do
+    action = params[:action]
+    
     user_tag = params['tag'].split('@').reject { |user| user.empty? }.first
     if user_tag.oct == 0
       @user = find_user_email(user_tag)
@@ -170,9 +173,9 @@ class App < Sinatra::Base
     end
     #creo que el error es cuando agregas uno que ta esta
     if @user && @current_user.id != @user.id 
-      if @user.is_admin && User.where(is_admin: true).all.length > 1
+      if action == 'delete_admin' && @user.is_admin && User.where(is_admin: true).all.length > 1
         @user.update(is_admin: false, updated_at: date_time)
-      else
+      elsif action == 'add_admin'
         @user.update(is_admin: true, updated_at: date_time)
       end
         redirect '/'
