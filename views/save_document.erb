@@ -19,6 +19,12 @@
                     <option value="Act">Acta</option>
                     <option value="Resolution">Resolucion</option>
                 </select> <br>
+                <label for="select_topic" >Tendencia</label> 
+                <select id="select_topic" name="select_topic"> 
+                    <%@topics.each do |topic|%>
+                        <option value=""><%=topic.name%></option>
+                    <%end%>
+                </select> <br>
                 <input name="fileInput" type="file" accept= ".pdf, .jpg, .jpeg, .png"  /> <br>
                 <input type="submit" value="Subir Documento"> 
             </form>

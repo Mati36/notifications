@@ -70,6 +70,7 @@ class App < Sinatra::Base
   end
 
   get '/save_document' do 
+    @topics = Topic.all 
     erb :save_document
   end
 
@@ -208,6 +209,19 @@ class App < Sinatra::Base
     end  
   end  
 
+  get '/add_topic' do
+    erb :new_topic
+  end  
+
+  post '/add_topic' do
+    new_topic = create_topic(params["topic"])
+    if new_topic.valid?
+      new_topic.save
+      redirect '/'
+    else
+      redirect '/add_topic'
+    end      
+  end 
  # metodos 
 
   def date_time 
@@ -266,7 +280,7 @@ class App < Sinatra::Base
   end 
   
   def create_topic(name)
-    return Topic.new(name: name).save
+    return Topic.new(name: name)
   end       
   
   def create_admin(name,lastname,dni,email,password)
