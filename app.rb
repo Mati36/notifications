@@ -15,6 +15,9 @@ class App < Sinatra::Base
   end 
 
   before do 
+    #esto no va es solo para el test 
+    test_run
+    
     @current_user = session[:current_user]
     @path = request.path_info
   
@@ -36,7 +39,7 @@ class App < Sinatra::Base
     request.body.rewind 
     hash = Rack::Utils.parse_nested_query(request.body.read)
     params = JSON.parse hash.to_json 
-    user = User.new(name: params['name'], lastname: params['lastname'], dni: params['dni'], email: params['email'],password: params['pwd'],created_at: date_time)  
+    user =  create_user(params['name'],params['lastname'],params['dni'],params['email'],params['pwd'])  
     
     if user.valid? 
       if User.all.length == 0
@@ -78,14 +81,14 @@ class App < Sinatra::Base
       @directory = "public/files/"
       @directory_temp = "#{date_time}"
       
-      document = Document.new(title: params["title"], type: params["type"], format:@fileFormat, visibility: true, user_id: @current_user.id, path:@directory_temp, created_at: date_time)
+      document = create_document(params["title"],params["type"],@fileFormat, @current_user.id, @directory_temp)
      
       if document.valid?
         document.save
         @id = Document.last.id
         @localPath = "#{@directory}#{@id}#{@fileFormat}"
         document.update(path: "/files/#{@id}#{@fileFormat}")
-        
+
         tags_user(params["tag"],document)
         dir_create(@directory)
        
@@ -163,19 +166,19 @@ class App < Sinatra::Base
 
   post '/change_role/:action' do
     action = params[:action]
+    user_tag = get_tags(params['tag']).first
     
-    user_tag = params['tag'].split('@').reject { |user| user.empty? }.first
     if user_tag.oct == 0
       @user = find_user_email(user_tag)
       logger.info(@user != nil) 
     elsif user_tag.length >= 8 
       @user =  find_user_dni(user_tag.to_i)
     end
-    #creo que el error es cuando agregas uno que ta esta
+   
     if @user && @current_user.id != @user.id 
       if action == 'delete_admin' && @user.is_admin && User.where(is_admin: true).all.length > 1
         @user.update(is_admin: false, updated_at: date_time)
-      elsif action == 'add_admin'
+      elsif action == 'create_admin'
         @user.update(is_admin: true, updated_at: date_time)
       end
         redirect '/'
@@ -213,7 +216,7 @@ class App < Sinatra::Base
  
   # este mertodo taggea a los usuarios con el documento
   def tags_user(tags_user, document) 
-    users = tags_user.split('@')
+    users = get_tags(tags_user)
     users.each do |user_dni|
      
       if !user_dni.empty?
@@ -249,8 +252,56 @@ class App < Sinatra::Base
     end
   end  
   
+  def get_tags(tags_user)
+    return tags_user.split('@').reject { |user| user.empty? }
+  end  
+
+  # tools
+  def user_subscription(topic)
+    @current_user.add_topic(topic)
+  end 
+
+  def document_add_topic(topic)
+    document.add_topic(topic)
+  end 
+  
+  def create_topic(name)
+    return Topic.new(name: name).save
+  end       
+  
+  def create_admin(name,lastname,dni,email,password)
+    user = User.new(name: name, lastname: lastname, dni: dni, 
+                      email: email, password: password, created_at: date_time)  
+    user.update(is_admin: true)
+    return user  
+  end  
+
+  def create_user(name,lastname,dni,email,password)
+    return  User.new(name: name, lastname: lastname, dni: dni, 
+                      email: email, password: password, created_at: date_time)  
+  end  
+
+  def create_document(title,type,file_format,user_id,path)
+    return Document.new(title: title, type: type, format: file_format, visibility: true, 
+                          user_id: user_id, path:path, created_at: date_time)
+  end  
+
+  #para el test
   def consola(ms,var)
     logger.info("#{ms} #{var}")
   end  
+  
+  def upload_users_test(session_user)
+    if (!session_user)
+      create_admin("Matias","Lopez",40277612,"lopezmatias36@gmail.com","1").save
+      create_user("Facundo","Fernandez",40277613,"facu@gmail.com","1").save
+    end 
+  end  
+
+  def test_run
+      session[:current_user] = User.first
+      upload_users_test(session[:current_user])
+  end 
+
 end
 
