@@ -4,6 +4,7 @@ class App < Sinatra::Base
   require 'sinatra'
   require './models/init.rb'
   require 'date'
+  require 'sinatra-websocket'
   include FileUtils::Verbose
 
   configure do 
@@ -12,6 +13,8 @@ class App < Sinatra::Base
     set :sessions_fail, '/'
     set :sessions_secret, "inhakiable papuuu"
     set :sessions_fail, true
+    set :server, 'thin'
+    set :sockets, []
   end 
 
   before do 
@@ -20,7 +23,7 @@ class App < Sinatra::Base
     
     @current_user = session[:current_user]
     @path = request.path_info
-  
+   
     if !@current_user && @path != '/login' && @path != '/signUp'
       redirect '/login'
     elsif @current_user
@@ -222,6 +225,8 @@ class App < Sinatra::Base
       redirect '/add_topic'
     end      
   end 
+
+  
  # metodos 
 
   def date_time 
@@ -301,21 +306,43 @@ class App < Sinatra::Base
   end  
 
   #para el test
+  
   def consola(ms,var)
     logger.info("#{ms} #{var}")
   end  
   
   def upload_users_test(session_user)
-    if (!session_user)
-      create_admin("Matias","Lopez",40277612,"lopezmatias36@gmail.com","1").save
+      create_admin("Test","Admin",40277610,"admin@gmail.com","1").save
+      create_user("Matias","Lopez",40277612,"mati@gmail.com","1").save
       create_user("Facundo","Fernandez",40277613,"facu@gmail.com","1").save
-    end 
+      create_user("Nahuel","Filippa",40277614,"nahuel@gmail.com","1").save
   end  
 
   def test_run
+      if (User.all.length <= 0)
+        upload_users_test(session[:current_user])
+      end  
       session[:current_user] = User.first
-      upload_users_test(session[:current_user])
   end 
-
+  
+  get "/ws" do
+    if !request.websocket?
+      erb :socket
+    else
+      request.websocket do |ws|
+        ws.onopen do
+         settings.sockets << ws
+        end
+        ws.onmessage do |msg|
+          ms = @current_user.name + " --> " +msg
+          EM.next_tick { settings.sockets.each {|s| s.send(ms) } }
+        end
+        ws.onclose do
+          settings.sockets.delete(ws)
+        end
+      end
+    end
+  end 
+  
 end
 
