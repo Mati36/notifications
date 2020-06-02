@@ -19,7 +19,7 @@ class App < Sinatra::Base
 
   before do 
     #esto no va es solo para el test 
-    test_run
+    test_run(1)
     
     @current_user = session[:current_user]
     @path = request.path_info
@@ -27,6 +27,9 @@ class App < Sinatra::Base
     if !@current_user && @path != '/login' && @path != '/signUp'
       redirect '/login'
     elsif @current_user
+      if (@path == '/signUp')
+        redirect '/'
+      end  
       if (!@current_user.is_admin && (@path == '/save_document' || @path == '/change_role'))
         redirect '/'
       end  
@@ -45,28 +48,20 @@ class App < Sinatra::Base
     user =  create_user(params['name'],params['lastname'],params['dni'],params['email'],params['pwd'])  
     
     if user.valid? 
-      if User.all.length == 0
-        user.update(is_admin: true)
-      end 
       user.save
       User.order(user.id)
-
       redirect '/login'
-      
     else
       [401,{},"Usuario no registrado"]
     end 
   end
 
   get '/signUp' do
-    if @current_user
-      session.clear
-    end
-    erb :signUp
+   erb :signUp
   end
 
   get '/log_out' do
-    if @current_user.id
+    if @current_user
       session.clear
     end
     redirect '/'
@@ -94,8 +89,7 @@ class App < Sinatra::Base
         document.update(path: "/files/#{@id}#{@fileFormat}")
 
         tags_user(params["tag"],document)
-        dir_create(@directory)
-       
+        
         cp(file.path, @localPath)
         File.chmod(0777, @localPath)
         redirect '/'
@@ -139,21 +133,21 @@ class App < Sinatra::Base
   end
 
   get '/doc_view/:id' do
-    @document = Document.find(id: params[:id])
+    doc_id =  params[:id].to_i
+    @document = Document.find(id: doc_id)
+    find_document_tag(@current_user.id,@document.id).update(checked: true)
     erb :doc_view, :layout => false 
   end
 
   get '/my_upload_documents' do
     @documents = Document.where(user_id: @current_user.id).order(:created_at).reverse
-    
     @user = find_user_id(@current_user.id)
     erb :documents
   end
 
   get '/delete_doc/:document' do
-    if params[:document] != nil
+    if !params[:document].nil?
       delete_doc(Document.find(id: params[:document]))
-      
     end  
    redirect '/my_upload_documents'
   end
@@ -174,7 +168,6 @@ class App < Sinatra::Base
     
     if user_tag.oct == 0
       @user = find_user_email(user_tag)
-      logger.info(@user != nil) 
     elsif user_tag.length >= 8 
       @user =  find_user_dni(user_tag.to_i)
     end
@@ -226,7 +219,6 @@ class App < Sinatra::Base
     end      
   end 
 
-  
  # metodos 
 
   def date_time 
@@ -264,18 +256,10 @@ class App < Sinatra::Base
     return User.find(email: current_email)
   end 
 
-  def dir_create(directory)
-    if !Dir.exist?(directory)
-      Dir.mkdir(directory)
-      File.chmod(0777, directory)
-    end
-  end  
-  
   def get_tags(tags_user)
     return tags_user.split('@').reject { |user| user.empty? }
   end  
 
-  # tools
   def user_subscription(topic)
     @current_user.add_topic(topic)
   end 
@@ -287,17 +271,16 @@ class App < Sinatra::Base
   def create_topic(name)
     return Topic.new(name: name)
   end       
-  
-  def create_admin(name,lastname,dni,email,password)
-    user = User.new(name: name, lastname: lastname, dni: dni, 
-                      email: email, password: password, created_at: date_time)  
-    user.update(is_admin: true)
-    return user  
-  end  
-
+ 
   def create_user(name,lastname,dni,email,password)
-    return  User.new(name: name, lastname: lastname, dni: dni, 
-                      email: email, password: password, created_at: date_time)  
+    user = User.new(name: name, lastname: lastname, dni: dni, 
+                     email: email, password: password, created_at: date_time)  
+
+    if (User.all.length <= 0)
+      user.update(is_admin: true)
+    end 
+    
+    return user
   end  
 
   def create_document(title,type,file_format,user_id,path)
@@ -305,6 +288,11 @@ class App < Sinatra::Base
                           user_id: user_id, path:path, created_at: date_time)
   end  
 
+  def find_document_tag(user_id, document_id)
+    return Tag.find(user_id: user_id, document_id: document_id)
+  end  
+  
+  
   #para el test
   
   def consola(ms,var)
@@ -312,17 +300,17 @@ class App < Sinatra::Base
   end  
   
   def upload_users_test(session_user)
-      create_admin("Test","Admin",40277610,"admin@gmail.com","1").save
+      create_user("Test","Admin",40277610,"admin@gmail.com","1").save
       create_user("Matias","Lopez",40277612,"mati@gmail.com","1").save
       create_user("Facundo","Fernandez",40277613,"facu@gmail.com","1").save
       create_user("Nahuel","Filippa",40277614,"nahuel@gmail.com","1").save
   end  
 
-  def test_run
+  def test_run(id)
       if (User.all.length <= 0)
         upload_users_test(session[:current_user])
       end  
-      session[:current_user] = User.first
+      session[:current_user] = User[id]
   end 
   
   get "/ws" do
