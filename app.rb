@@ -238,7 +238,11 @@ class App < Sinatra::Base
 
   get '/add_fav/:id' do
     doc_id = params[:id].to_i 
-    find_document_tag(@current_user.id,doc_id).update(favorite: true)
+    doc = find_document_tag(@current_user.id,doc_id)
+    if doc.nil?
+      @current_user.add_document(doc)
+    end 
+    doc.update(favorites: true, tag: false)  
     redirect '/my_tags'
   end  
 
