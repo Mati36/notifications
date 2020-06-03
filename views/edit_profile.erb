@@ -2,7 +2,7 @@
 <html lang="es"> 
     <head>
         <meta charset = "utf-8">
-        <title>login</title>
+        <title>edit_profile</title>
     </head>
     <body>
         <div>
@@ -14,7 +14,7 @@
                 <input type="text" name="lastname" value= <%=@current_user.lastname%> / data-validation="alphanumeric" > <br>
                 <label for="email">Email</label> 
                 <input type="text" name="email" value= <%=@current_user.email%> / data-validation="email" > <br>   
-                <input type="password" name="password" > <br>   
+                <a href = '/change_password'> Cambiar contraseña </a> 
                 <input type="submit" value="Aceptar">  
             </form>   
         </div>

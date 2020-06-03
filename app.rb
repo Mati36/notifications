@@ -196,13 +196,30 @@ class App < Sinatra::Base
     if params["name"].empty? || params["lastname"].empty? || params["email"].empty?
       redirect '/edit_profile'
     else
-      if (params["password"] == @current_user.password)
+      #if (params["password"] == @current_user.password)
         @current_user.update(name: params["name"], lastname: params["lastname"], email: params["email"], updated_at: date_time)
         redirect '/profile' 
-      else
-        redirect '/edit_profile'
-      end
+      #else
+       # redirect '/edit_profile'
+      #end
     end  
+  end  
+
+  get '/change_password' do
+    erb :change_password
+  end  
+
+  post '/change_password' do 
+    if (params["current_pass"] == @current_user.password)
+      if (params["pass1"] == params["pass2"])
+        @current_user.update(password: params["pass1"])
+        redirect '/edit_profile'
+      else
+        redirect '/change_password'
+      end  
+    else
+      redirect '/change_password'
+    end    
   end  
 
   get '/add_topic' do
