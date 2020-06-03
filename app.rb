@@ -19,7 +19,7 @@ class App < Sinatra::Base
 
   before do 
     #esto no va es solo para el test 
-    test_run(1)
+    test_run(2)
     
     @current_user = session[:current_user]
     @path = request.path_info
@@ -108,7 +108,7 @@ class App < Sinatra::Base
   end
 
   get '/login' do
-    if(@current_user)
+    if @current_user
       redirect '/'
     else
       erb :login
@@ -165,18 +165,18 @@ class App < Sinatra::Base
   post '/change_role/:action' do
     action = params[:action]
     user_tag = get_tags(params['tag']).first
-    
     if user_tag.oct == 0
       @user = find_user_email(user_tag)
     elsif user_tag.length >= 8 
       @user =  find_user_dni(user_tag.to_i)
     end
-   
+    consola("Encontro usuario",action)
+
     if @user && @current_user.id != @user.id 
       if action == 'delete_admin' && @user.is_admin && User.where(is_admin: true).all.length > 1
         @user.update(is_admin: false, updated_at: date_time)
-      elsif action == 'create_admin'
-        @user.update(is_admin: true, updated_at: date_time)
+      elsif action == 'add_admin'
+       @user.update(is_admin: true, updated_at: date_time)
       end
         redirect '/'
     else 
@@ -235,6 +235,18 @@ class App < Sinatra::Base
       redirect '/add_topic'
     end      
   end 
+
+  get '/add_fav/:id' do
+    doc_id = params[:id].to_i 
+    find_document_tag(@current_user.id,doc_id).update(favorite: true)
+    redirect '/my_tags'
+  end  
+
+  get '/del_fav/:id' do
+    doc_id = params[:id].to_i 
+    find_document_tag(@current_user.id,doc_id).update(favorite: false)
+    redirect '/my_tags'
+  end  
 
  # metodos 
 
@@ -334,20 +346,34 @@ class App < Sinatra::Base
     if !request.websocket?
       erb :socket
     else
+     
       request.websocket do |ws|
-        ws.onopen do
-         settings.sockets << ws
-        end
-        ws.onmessage do |msg|
-          ms = @current_user.name + " --> " +msg
-          EM.next_tick { settings.sockets.each {|s| s.send(ms) } }
-        end
-        ws.onclose do
-          settings.sockets.delete(ws)
-        end
+        ws_open(ws) 
+        ws_msj(ws) 
+        ws_close(ws)
       end
+   
     end
   end 
+  
+  def ws_open(ws)
+    ws.onopen do
+      settings.sockets << ws
+    end
+  end  
+  
+  def ws_close(ws)
+    ws.onclose do
+      settings.sockets.delete(ws)
+    end
+  end  
+  
+  def ws_msj(ws)
+    ws.onmessage do |msg|
+      ms = @current_user.name + " --> " +msg
+      EM.next_tick { settings.sockets.each {|s| s.send(ms) } }
+    end
+  end  
   
 end
 
