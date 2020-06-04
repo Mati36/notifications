@@ -273,6 +273,11 @@ class App < Sinatra::Base
     redirect 'users_list'  
   end 
 
+  get '/my_favorites' do 
+    @documents = Document.join(Tag.where(favorite: true),document_id: :id)
+    erb :documents
+  end
+
  # metodos 
 
   def date_time 
