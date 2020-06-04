@@ -12,27 +12,38 @@
                 <tr>
                   <th>Titulo</th>
                   <th>Fecha de subida</th>
+                  <th>Descripcion</th>
                     <% if @current_user.is_admin %>
                         <th></th>
                     <% end %> 
                 </tr>
 
-                <%@documents.each do |document|%> 
-                 
-                    <tr>  
-                        <% if document.visibility %>   
-                            <td><a href = '/doc_view/<%= document.id%>' target="_blank" > <%= document.title%></a></td>
-                            <td><%=document.created_at.to_date%></td>
-                            <td><a href = '/add_fav/<%=document.id%>' >Agregar a favoritos</a></td>
-                            <% if !find_document_tag(@current_user.id, document.id).nil? %> 
-                                <td><a href = '/del_fav/<%=document.id%>' >Eliminar de favoritos</a></td>
-                            <%else%>
-                                <td></td>
+                <%@documents.each do |document| 
+                    doc = find_document_user(@current_user.id, document.id)
+                    #hacer mas optimas estas validaciones 
+                    if doc 
+                        if doc.checked %>
+                            <tr id="row" style="background-color:#838383">    
+                        <%else%>
+                            <tr id="row">      
                             <%end%>
-                            <% if @current_user.is_admin %>   
-                                <td><a name ="delete" href = '/delete_doc/<%=document.id%>'>Eliminar</a></td>
-                            <% end %>  
+                    <%else%>
+                        <tr id="row">  
+                    <%end%>  
+                    <% if document.visibility %>   
+                        <td><a href = '/doc_view/<%= document.id%>' target="_blank" > <%= document.title%></a></td>
+                        <td><%=document.created_at.to_date%></td>
+                        <td><%=document.description%></td>
+                        <% if !find_document_favorite(@current_user.id,document.id) %> 
+                            <td><a href = '/add_fav/<%=document.id%>' >Agregar a favoritos</a></td>
+                        <%else%>
+                            <td><a href = '/del_fav/<%=document.id%>' >Eliminar de favoritos</a></td>                
+                        <%end%>   
+                        
+                        <% if @current_user.is_admin %>   
+                            <td><a name ="delete" href = '/delete_doc/<%=document.id%>'>Eliminar</a></td>
                         <% end %>  
+                    <% end %>  
                     </tr>       
                 <%end%>
             </table>
@@ -41,21 +52,11 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
     </body>
-    <%# <script>
-        function addFav() {
-            <%  
-                if @doc
-                    document_fav = find_document_tag(@current_user.id,@doc.id)
-                    consola("if 1 ","")
-                end 
-                if document_fav
-                    document_fav.update(favorite: true)
-                    consola("if 2 ","")
-                end 
-                consola("Fuera de los if","")
-            %>
-        <%# } %>
-    <%# </script>  %>
+    <script>
+        function checked(check) {
+            
+         } 
+    </script> 
 
 </html>
 

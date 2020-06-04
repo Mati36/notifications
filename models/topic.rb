@@ -10,10 +10,8 @@ class Topic < Sequel::Model
     end
     
     many_to_many :users
-    
-
-    # many_to_one :users
+   
     one_to_many :documents
-    one_to_many :topics_users
+    one_to_many :topics_users 
     
 end

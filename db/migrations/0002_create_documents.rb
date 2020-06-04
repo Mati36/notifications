@@ -7,6 +7,7 @@ Sequel.migration do
       String          :format,        null: false 
       TrueClass       :visibility,    null: false 
       String          :path,          null: false
+      String          :description
       foreign_key     :user_id,       :users 
       DateTime        :created_at,     null: false
     end 

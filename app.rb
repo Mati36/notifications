@@ -19,7 +19,7 @@ class App < Sinatra::Base
 
   before do 
     #esto no va es solo para el test 
-    test_run(2)
+    test_run(1)
     
     @current_user = session[:current_user]
     @path = request.path_info
@@ -80,7 +80,7 @@ class App < Sinatra::Base
       @directory = "public/files/"
       @directory_temp = "#{date_time}"
       
-      document = create_document(params["title"],params["type"],@fileFormat, @current_user.id, @directory_temp)
+      document = create_document(params["title"],params["type"],@fileFormat,params["description"] ,@current_user.id, @directory_temp)
      
       if document.valid?
         document.save
@@ -88,7 +88,7 @@ class App < Sinatra::Base
         @localPath = "#{@directory}#{@id}#{@fileFormat}"
         document.update(path: "/files/#{@id}#{@fileFormat}")
 
-        tags_user(params["tag"],document)
+        tags_user_document(params["tag"],document)
         
         cp(file.path, @localPath)
         File.chmod(0777, @localPath)
@@ -135,7 +135,7 @@ class App < Sinatra::Base
   get '/doc_view/:id' do
     doc_id =  params[:id].to_i
     @document = Document.find(id: doc_id)
-    find_document_tag(@current_user.id,@document.id).update(checked: true)
+    user_cheked_document(@document)
     erb :doc_view, :layout => false 
   end
 
@@ -153,7 +153,7 @@ class App < Sinatra::Base
   end
 
   get '/my_tags' do 
-    @documents = Document.join(Tag.where(user_id: @current_user.id),document_id: :id)
+    @documents = Document.join(Tag.where(user_id: @current_user.id, tag: true),document_id: :id)
     erb :documents
   end  
 
@@ -176,7 +176,7 @@ class App < Sinatra::Base
       if action == 'delete_admin' && @user.is_admin && User.where(is_admin: true).all.length > 1
         @user.update(is_admin: false, updated_at: date_time)
       elsif action == 'add_admin'
-       @user.update(is_admin: true, updated_at: date_time)
+        @user.update(is_admin: true, updated_at: date_time)
       end
         redirect '/'
     else 
@@ -237,18 +237,14 @@ class App < Sinatra::Base
   end 
 
   get '/add_fav/:id' do
-    doc_id = params[:id].to_i 
-    doc = find_document_tag(@current_user.id,doc_id)
-    if doc.nil?
-      @current_user.add_document(doc)
-    end 
-    doc.update(favorites: true, tag: false)  
+    doc = Document.find(id: params[:id].to_i )
+    user_add_favorite_document(doc)
     redirect '/my_tags'
   end  
 
   get '/del_fav/:id' do
-    doc_id = params[:id].to_i 
-    find_document_tag(@current_user.id,doc_id).update(favorite: false)
+    doc = Document.find(id: params[:id].to_i)
+    user_del_favorite_document(doc)
     redirect '/my_tags'
   end  
 
@@ -259,7 +255,7 @@ class App < Sinatra::Base
   end  
  
   # este mertodo taggea a los usuarios con el documento
-  def tags_user(tags_user, document) 
+  def tags_user_document(tags_user, document) 
     users = get_tags(tags_user)
     users.each do |user_dni|
      
@@ -270,6 +266,39 @@ class App < Sinatra::Base
       end  
     end
   end  
+
+  def user_cheked_document(document)
+    doc = find_document_user(@current_user.id, document.id)
+    if doc.nil?
+      @current_user.add_document(document)
+      doc = Tag.last
+    end 
+      doc.update(checked: true)
+  end 
+
+  def user_add_favorite_document(document)
+    doc = find_document_user(@current_user.id, document.id)
+    if doc.nil?
+      @current_user.add_document(document)
+      doc = Tag.last
+    end 
+      doc.update(favorite: true)
+  end 
+
+  def user_del_favorite_document(document)
+    doc = find_document_user(@current_user.id, document.id)
+    if !doc.nil?
+      doc.update(favorite: false)
+    end 
+  end 
+
+  def find_document_user(user_id, document_id)
+    return Tag.find(user_id: user_id, document_id: document_id)
+  end
+ 
+  def find_document_favorite(user_id, document_id)
+     return Tag.find(user_id: user_id, document_id: document_id,favorite: true) 
+  end 
 
   def delete_doc(document)
      if document
@@ -316,16 +345,11 @@ class App < Sinatra::Base
     return user
   end  
 
-  def create_document(title,type,file_format,user_id,path)
+  def create_document(title,type,file_format,description,user_id,path)
     return Document.new(title: title, type: type, format: file_format, visibility: true, 
-                          user_id: user_id, path:path, created_at: date_time)
+                        description: description, user_id: user_id, path:path, created_at: date_time)
   end  
 
-  def find_document_tag(user_id, document_id)
-    return Tag.find(user_id: user_id, document_id: document_id)
-  end  
-  
-  
   #para el test
   
   def consola(ms,var)
@@ -333,7 +357,7 @@ class App < Sinatra::Base
   end  
   
   def upload_users_test(session_user)
-      create_user("Test","Admin",40277610,"admin@gmail.com","1").save
+      create_user("Nuevo","Administrador",40277610,"admin@gmail.com","1").save
       create_user("Matias","Lopez",40277612,"mati@gmail.com","1").save
       create_user("Facundo","Fernandez",40277613,"facu@gmail.com","1").save
       create_user("Nahuel","Filippa",40277614,"nahuel@gmail.com","1").save
