@@ -21,7 +21,7 @@ class App < Sinatra::Base
     #esto no va es solo para el test 
     test_run(1)
     
-    @current_user = session[:current_user]
+    @current_user = User.find(id: session[:user_id])
     @path = request.path_info
    
     if !@current_user && @path != '/login' && @path != '/signUp'
@@ -119,7 +119,7 @@ class App < Sinatra::Base
     user = find_user_email(params['email'])
     
     if user && user.password == params['pwd']
-      session[:current_user] = user
+      session[:user_id] = user.id
       redirect '/'
     else
       redirect '/login'
@@ -145,7 +145,8 @@ class App < Sinatra::Base
     erb :documents
   end
 
-  get '/delete_doc/:document' do
+  ## tiene que ser un delete o un post
+  get '/delete_doc/:document' do 
     if !params[:document].nil?
       delete_doc(Document.find(id: params[:document]))
     end  
@@ -156,33 +157,6 @@ class App < Sinatra::Base
     @documents = Document.join(Tag.where(user_id: @current_user.id, tag: true),document_id: :id)
     erb :documents
   end  
-
-  get '/change_role/:action' do 
-    @act = params[:action]
-    erb :change_role 
-  end
-
-  post '/change_role/:action' do
-    action = params[:action]
-    user_tag = get_tags(params['tag']).first
-    if user_tag.oct == 0
-      @user = find_user_email(user_tag)
-    elsif user_tag.length >= 8 
-      @user =  find_user_dni(user_tag.to_i)
-    end
-    consola("Encontro usuario",action)
-
-    if @user && @current_user.id != @user.id 
-      if action == 'delete_admin' && @user.is_admin && User.where(is_admin: true).all.length > 1
-        @user.update(is_admin: false, updated_at: date_time)
-      elsif action == 'add_admin'
-        @user.update(is_admin: true, updated_at: date_time)
-      end
-        redirect '/'
-    else 
-      redirect '/change_role'  
-    end  
-  end   
 
   get '/profile' do 
     erb :profile
@@ -236,6 +210,8 @@ class App < Sinatra::Base
     end      
   end 
 
+
+  ## unificar estos 3 metodos, capaz tengan que ser post
   get '/add_fav/:id' do
     doc = Document.find(id: params[:id].to_i )
     user_add_favorite_document(doc)
@@ -247,6 +223,55 @@ class App < Sinatra::Base
     user_del_favorite_document(doc)
     redirect '/my_tags'
   end  
+
+  get '/change_role/:action' do 
+    @act = params[:action]
+    erb :change_role 
+  end
+
+  post '/change_role/:action' do
+    action = params[:action]
+    user_tag = get_tags(params['tag']).first
+    if user_tag.oct == 0
+      @user = find_user_email(user_tag)
+    elsif user_tag.length >= 8 
+      @user =  find_user_dni(user_tag.to_i)
+    end
+    consola("Encontro usuario",action)
+
+    if @user && @current_user.id != @user.id 
+      if action == 'delete_admin' && @user.is_admin && User.where(is_admin: true).all.length > 1
+        @user.update(is_admin: false, updated_at: date_time)
+      elsif action == 'add_admin'
+        @user.update(is_admin: true, updated_at: date_time)
+      end
+        redirect '/'
+    else 
+      redirect '/change_role'  
+    end  
+  end   
+
+  get '/users_list' do
+    @users = User.all
+    erb :users_list
+  end 
+
+  ## estos tienen que post y delete 
+  get '/add_admin/:user_dni' do
+    user = find_user_dni(params[:user_dni])
+    if user 
+      user.update(is_admin: true)
+    end   
+    redirect 'users_list'
+  end 
+
+  get '/del_admin/:user_dni' do
+    user = find_user_dni(params[:user_dni])
+    if user 
+      user.update(is_admin: false)
+    end 
+    redirect 'users_list'  
+  end 
 
  # metodos 
 
@@ -345,6 +370,7 @@ class App < Sinatra::Base
     return user
   end  
 
+  # no hace falta
   def create_document(title,type,file_format,description,user_id,path)
     return Document.new(title: title, type: type, format: file_format, visibility: true, 
                         description: description, user_id: user_id, path:path, created_at: date_time)
@@ -367,7 +393,7 @@ class App < Sinatra::Base
       if (User.all.length <= 0)
         upload_users_test(session[:current_user])
       end  
-      session[:current_user] = User[id]
+      session[:user_id] = User[id].id
   end 
   
   get "/ws" do
