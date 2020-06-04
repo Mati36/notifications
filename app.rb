@@ -19,7 +19,7 @@ class App < Sinatra::Base
 
   before do 
     #esto no va es solo para el test 
-    test_run(1)
+    test_run(4)
     
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
@@ -145,8 +145,7 @@ class App < Sinatra::Base
     erb :documents
   end
 
-  ## tiene que ser un delete o un post
-  get '/delete_doc/:document' do 
+  delete '/delete_doc/:document' do 
     if !params[:document].nil?
       delete_doc(Document.find(id: params[:document]))
     end  
@@ -215,13 +214,13 @@ class App < Sinatra::Base
   get '/add_fav/:id' do
     doc = Document.find(id: params[:id].to_i )
     user_add_favorite_document(doc)
-    redirect '/my_tags'
+    redirect back
   end  
 
   get '/del_fav/:id' do
     doc = Document.find(id: params[:id].to_i)
     user_del_favorite_document(doc)
-    redirect '/my_tags'
+    redirect back 
   end  
 
   get '/change_role/:action' do 
@@ -274,7 +273,7 @@ class App < Sinatra::Base
   end 
 
   get '/my_favorites' do 
-    @documents = Document.join(Tag.where(favorite: true),document_id: :id)
+    @documents = Document.join(Tag.where(user_id: @current_user.id, favorite: true),document_id: :id)
     erb :documents
   end
 
