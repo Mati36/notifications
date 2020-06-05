@@ -31,19 +31,20 @@
                         <tr id="row">  
                     <%end%>  
                     <% if document.visibility %>   
-                        <td><a href = '/doc_view/<%= document.id%>' target="_blank" > <%= document.title%></a></td>
-                        <td><%=document.created_at.to_date%></td>
-                        <td><%=document.description%></td>
-                       
-                        <% if !find_document_favorite(@current_user.id,document.id) && request.path_info != '/my_favorites' %> 
-                            <td><a href = '/add_fav/<%=document.id%>' >Agregar a favoritos</a></td>
-                        <%else%>
-                            <td><a href = '/del_fav/<%=document.id%>' >Eliminar de favoritos</a></td>                
-                        <%end%>   
-                       
-                        <% if @current_user.is_admin %>   
-                            <td><a name ="delete" href = '/delete_doc/<%=document.id%>'>Eliminar</a></td>
-                        <% end %>  
+                        <form action="" method="POST">
+                            <td><a href = '/doc_view/<%= document.id%>' target="_blank" > <%= document.title%></a></td>
+                            <td><%=document.created_at.to_date%></td>
+                            <td><%=document.description%></td>
+
+                            <% if !find_document_favorite(@current_user.id,document.id) && request.path_info != '/my_favorites' %> 
+                                <td><button name="add_favorite_doc" type="submit" value="<%=document.id%>" formaction="/add_fav">Agregar a favoritos</button> </td>
+                            <%else%>
+                                <td><button name="del_favorite_doc" type="submit" value="<%=document.id%>" formaction="/del_fav">Eliminar de favoritos</button> </td>
+                            <%end%>   
+                            <% if @current_user.is_admin %>   
+                                <td><button name="delete_doc" type="submit" value="<%=document.id%>" formaction="/delete_doc">Eliminar</button> </td>
+                            <% end %>
+                        </form>  
                     <% end %>  
                     </tr>       
                 <%end%>

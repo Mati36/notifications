@@ -145,9 +145,10 @@ class App < Sinatra::Base
     erb :documents
   end
 
-  get '/delete_doc/:document' do 
-    if !params[:document].nil?
-      delete_doc(Document.find(id: params[:document]))
+  post '/delete_doc' do 
+    doc_id = params["delete_doc"] 
+    if !doc_id.nil?
+      delete_doc(Document.find(id: doc_id))
     end  
    redirect '/my_upload_documents'
   end
@@ -220,14 +221,16 @@ class App < Sinatra::Base
 
 
   ## unificar estos 3 metodos, capaz tengan que ser post
-  get '/add_fav/:id' do
-    doc = Document.find(id: params[:id].to_i )
+  post '/add_fav' do
+    doc_id = params["add_favorite_doc"]
+    doc = Document.find(id: doc_id )
     user_add_favorite_document(doc)
     redirect back
   end  
 
-  get '/del_fav/:id' do
-    doc = Document.find(id: params[:id].to_i)
+  post '/del_fav' do
+    doc_id = params["del_favorite_doc"]
+    doc = Document.find(id: doc_id)
     user_del_favorite_document(doc)
     redirect back 
   end  
