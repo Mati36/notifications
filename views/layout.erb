@@ -13,6 +13,7 @@
             <div class=espacio-escudo>
                 <img src="/images/logounrc.png" class="escudo">
             </div>
+            <div class="logoutButton"><a href = '/log_out'> Cerrar Sesion </a> </div>
         </div> 
         <div class="row">
                 <div class="menuPanel">
@@ -20,23 +21,23 @@
                     <div class = "offset"></div>
                     <div class="menu">
                         <div class="menuButton"><a href = '/documents'> Todos los Documentos </a> </div> 
-                        <%if(@current_user.is_admin)%>
-                            <div class="menuButton"><a href = '/save_document'> Subir Documento </a> </div> 
-                            <div class="menuButton"><a href = '/my_upload_documents'> Mis Documentos Subidos </a> </div> 
-                            <div class="menuButton"><a href = '/change_role/add_admin'> Nuevo Administrador </a> </div> 
-                            <div class="menuButton"><a href = '/change_role/delete_admin'> Borrar Administrador </a> </div>
-                            <div class="menuButton"><a href = '/add_topic'> Crear Tendencia </a> </div>
-                        <%end%>
-                        <div class="menuContainer">
-                            <div class="dropTrigger"> <p>Menu</p> </div>
-                            <div class="dropdown">
-                                <div class="menuButton"><a href = '/my_favorites'> Documentos Favoritos </a> </div>
-                                <div class="menuButton"><a href = '/my_tags'> Documentos Etiquetado </a> </div> 
-                                <div class="menuButton"><a href = '/profile/<%=@current_user.id%>'> Mi Perfil </a> </div>
-                            </div>
-                        </div>
-                        <div class="menuButton"><a href = '/log_out'> Cerrar Sesion </a> </div>
+                        <div class="menuButton"><a href = '/my_favorites'> Documentos Favoritos </a> </div>
+                        <div class="menuButton"><a href = '/my_tags'> Documentos Etiquetado </a> </div> 
+                        <div class="menuButton"><a href = '/profile/<%=@current_user.id%>'> Mi Perfil </a> </div>
                         <div class="menuButton"><a href = '/users_list'> Usuarios </a> </div>
+                        <%if(@current_user.is_admin)%>
+                            <div class="menuContainer">
+                                <div class="dropTrigger"> <p class= adm>Opc. Administrador</p> </div>
+                                <div class="dropdown">
+                                    <div class="menuButton"><a href = '/save_document'> Subir Documento </a> </div> 
+                                    <div class="menuButton"><a href = '/my_upload_documents'> Mis Documentos Subidos </a> </div> 
+                                    <div class="menuButton"><a href = '/change_role/add_admin'> Nuevo Administrador </a> </div> 
+                                    <div class="menuButton"><a href = '/change_role/delete_admin'> Borrar Administrador </a> </div>
+                                    <div class="menuButton"><a href = '/add_topic'> Crear Tendencia </a> </div>
+                                </div>
+                            </div>
+                        <%end%>
+                        <!-- <div class="menuButton"><a href = '/log_out'> Cerrar Sesion </a> </div> -->
                     </div>
                 <%end%>
             </div> 
