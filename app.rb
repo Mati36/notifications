@@ -19,7 +19,7 @@ class App < Sinatra::Base
 
   before do 
     #esto no va es solo para el test 
-    test_run(4)
+    test_run(1)
     
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
@@ -89,7 +89,7 @@ class App < Sinatra::Base
         document.update(path: "/files/#{@id}#{@fileFormat}")
 
         tags_user_document(params["tag"],document)
-        
+
         cp(file.path, @localPath)
         File.chmod(0777, @localPath)
         redirect '/'
@@ -145,7 +145,7 @@ class App < Sinatra::Base
     erb :documents
   end
 
-  delete '/delete_doc/:document' do 
+  get '/delete_doc/:document' do 
     if !params[:document].nil?
       delete_doc(Document.find(id: params[:document]))
     end  
@@ -157,7 +157,8 @@ class App < Sinatra::Base
     erb :documents
   end  
 
-  get '/profile' do 
+  get '/profile/:user_id' do 
+    @user = User.find(id: params[:user_id])
     erb :profile
   end  
 
@@ -166,15 +167,23 @@ class App < Sinatra::Base
   end  
 
   post '/edit_profile' do
+
+    if(params[:fileInput])
+      file = params[:fileInput][:tempfile]
+      @fileFormat = File.extname(file)
+      @localpath_avatar = "/images/avatars/#{@directory}#{@current_user.id}#{@fileFormat}"
+      @current_user.update(avatar_path: @localpath_avatar)
+      @directory = "public/#{@localpath_avatar}"
+
+      cp(file.path, @directory)
+      File.chmod(0777, @directory)
+    end   
+
     if params["name"].empty? || params["lastname"].empty? || params["email"].empty?
       redirect '/edit_profile'
     else
-      #if (params["password"] == @current_user.password)
-        @current_user.update(name: params["name"], lastname: params["lastname"], email: params["email"], updated_at: date_time)
-        redirect '/profile' 
-      #else
-       # redirect '/edit_profile'
-      #end
+      @current_user.update(name: params["name"], lastname: params["lastname"], email: params["email"], updated_at: date_time)
+      redirect "/profile/#{@current_user.id}" 
     end  
   end  
 
@@ -283,7 +292,7 @@ class App < Sinatra::Base
    return DateTime.now.strftime("%m/%d/%Y: %T")
   end  
  
-  # este mertodo taggea a los usuarios con el documento
+  # este metodo taggea a los usuarios con el documento
   def tags_user_document(tags_user, document) 
     users = get_tags(tags_user)
     users.each do |user_dni|

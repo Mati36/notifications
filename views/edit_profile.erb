@@ -6,8 +6,10 @@
     </head>
     <body>
         <div>
-            <form action="/edit_profile" method="POST">
+            <form action="/edit_profile" method="POST" enctype="multipart/form-data">
                 Editar Perfil <br>
+                <img src="<%=@current_user.avatar_path%>" class="picture" style="width:180px;height:180px;"> <br>   
+                <input name="fileInput" type="file" accept= ".jpg, .jpeg, .png"  /> <br> 
                 <label for="name">nombre</label>
                 <input type="text" name="name" value= <%=@current_user.name%>  / data-validation="alphanumeric" > <br>
                 <label for="lastname">Apellido</label> 

@@ -3,22 +3,23 @@
     <head>
         <meta charset = "utf-8">
         <title>users_list</title>
-        <link rel="stylesheet" href="/css/loginStyle.css">
+        <link rel="stylesheet" href="css/documentsStyle.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
     </head>
     <body>
-        <div class="users_list">
-            <table class="table_users">
+        <div class="documents">
+            <table id="docs">
                 <tr>
+                    <th></th>
                     <th> Nombre </th>
                     <th> Dni </th>
                     <th> Email </th>
                     <th> Rol </th>
                 </tr>
-                
                 <% @users.each do |user| %>
-                    <tr>   
-                        <td><%= "#{user.name}  #{user.lastname}" %></td>
+                    <tr>
+                        <td><img src="<%= user.avatar_path%>" alt="avatar" style="width:20px;height:20px;"></td>   
+                        <td><a href = '/profile/<%=user.id%>' ><%="#{user.name}  #{user.lastname}"%></a></td>
                         <td><%= user.dni %></td>
                         <td><%= user.email %></td>
                         <td><%= user.is_admin ? "Administrador" : "Usuario" %></td>
