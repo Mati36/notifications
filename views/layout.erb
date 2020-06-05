@@ -27,9 +27,14 @@
                             <div class="menuButton"><a href = '/change_role/delete_admin'> Borrar Administrador </a> </div>
                             <div class="menuButton"><a href = '/add_topic'> Crear Tendencia </a> </div>
                         <%end%>
-                        <div class="menuButton"><a href = '/my_favorites'> Documentos Favoritos </a> </div>
-                        <div class="menuButton"><a href = '/my_tags'> Documentos Etiquetado </a> </div> 
-                        <div class="menuButton"><a href = '/profile'> Mi Perfil </a> </div> 
+                        <div class="menuContainer">
+                            <div class="dropTrigger"> <p>Menu</p> </div>
+                            <div class="dropdown">
+                                <div class="menuButton"><a href = '/my_favorites'> Documentos Favoritos </a> </div>
+                                <div class="menuButton"><a href = '/my_tags'> Documentos Etiquetado </a> </div> 
+                                <div class="menuButton"><a href = '/profile/<%=@current_user.id%>'> Mi Perfil </a> </div>
+                            </div>
+                        </div>
                         <div class="menuButton"><a href = '/log_out'> Cerrar Sesion </a> </div>
                         <div class="menuButton"><a href = '/users_list'> Usuarios </a> </div>
                     </div>

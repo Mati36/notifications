@@ -1,7 +1,3 @@
-h4{
-  color: black;
-}
-
 .header{
   position: fixed;
   top: 0;
@@ -32,6 +28,29 @@ h4{
   left: 0%;
   width: 20%;
   height: 100%;
+}
+
+.menuContainer{
+  visibility: visible;
+  height: 4%;
+  border-bottom: 1px solid grey;
+}
+
+.dropdown{
+  display: none;
+}
+
+.menuContainer:hover .dropdown{
+  display: block;
+}
+
+.dropTrigger{
+  height: 20px;
+  width: 50px;
+}
+
+.menuContainer :hover{
+  background-color: brown;
 }
 
 .offset{
