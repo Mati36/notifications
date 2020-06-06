@@ -16,22 +16,24 @@
                     <th> Email </th>
                     <th> Rol </th>
                 </tr>
-                <% @users.each do |user| %>
-                    <tr>
-                        <td><img src="<%= user.avatar_path%>" alt="avatar" style="width:20px;height:20px;"></td>   
-                        <td><a href = '/profile/<%=user.id%>' ><%="#{user.name}  #{user.lastname}"%></a></td>
-                        <td><%= user.dni %></td>
-                        <td><%= user.email %></td>
-                        <td><%= user.is_admin ? "Administrador" : "Usuario" %></td>
-                        <% if user.dni != @current_user.dni%>  
-                            <% if @current_user.is_admin && user.is_admin%>
-                                <td><a href = '/del_admin/<%=user.dni%>' >Eliminar administrador</a></td>
-                            <% elsif @current_user.is_admin  %>
-                                <td><a href = '/add_admin/<%=user.dni%>' >Agregar administrador</a></td>
+                <form action="" method="POST">
+                    <% @users.each do |user| %>
+                        <tr>
+                            <td><img src="<%= user.avatar_path%>" alt="avatar" style="width:20px;height:20px;"></td>   
+                            <td><a href = '/profile/<%=user.id%>' ><%="#{user.name}  #{user.lastname}"%></a></td>
+                            <td><%= user.dni %></td>
+                            <td><%= user.email %></td>
+                            <td><%= user.is_admin ? "Administrador" : "Usuario" %></td>
+                            <% if user.dni != @current_user.dni%>  
+                                <% if @current_user.is_admin && user.is_admin%>
+                                    <td><button name="delAdmin_id" type="submit" value="<%=user.id%>" formaction="/del_admin">Eliminar administrador</button> </td>
+                                <% elsif @current_user.is_admin  %>
+                                    <td><button name="addAdmin_id" type="submit" value="<%=user.id%>" formaction="/add_admin">Añadir administrador</button> </td>
+                                <% end %>
                             <% end %>
-                        <% end %>
-                    </tr>
-                <% end %>
+                        </tr>
+                    <% end %>
+                </form>
             </table>
         </div>
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

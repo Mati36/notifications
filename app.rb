@@ -80,8 +80,10 @@ class App < Sinatra::Base
       @directory = "public/files/"
       @directory_temp = "#{date_time}"
       
-      document = create_document(params["title"],params["type"],@fileFormat,params["description"] ,@current_user.id, @directory_temp)
-     
+      document = Document.new(title: params["title"], type: params["type"], format: @fileFormat,
+                              description: params["description"], user_id: @current_user.id, 
+                              path: @directory_temp, visibility: true, created_at: date_time)
+
       if document.valid?
         document.save
         @id = Document.last.id
@@ -268,16 +270,18 @@ class App < Sinatra::Base
   end 
 
   ## estos tienen que post y delete 
-  get '/add_admin/:user_dni' do
-    user = find_user_dni(params[:user_dni])
+  post '/add_admin' do
+    user_id = params["addAdmin_id"]
+    user = find_user_id(user_id)
     if user 
       user.update(is_admin: true)
     end   
     redirect 'users_list'
   end 
 
-  get '/del_admin/:user_dni' do
-    user = find_user_dni(params[:user_dni])
+  post '/del_admin' do
+    user_id = params["delAdmin_id"]
+    user = find_user_id(user_id)
     if user 
       user.update(is_admin: false)
     end 
@@ -321,7 +325,7 @@ class App < Sinatra::Base
     doc = find_document_user(@current_user.id, document.id)
     if doc.nil?
       @current_user.add_document(document)
-      doc = Tag.last
+      doc = find_document_user(@current_user.id, document.id)
     end 
       doc.update(favorite: true)
   end 
@@ -330,6 +334,9 @@ class App < Sinatra::Base
     doc = find_document_user(@current_user.id, document.id)
     if !doc.nil?
       doc.update(favorite: false)
+      if !doc.tag && !doc.checked
+        @current_user.remove_document(document)
+      end 
     end 
   end 
 
@@ -384,12 +391,6 @@ class App < Sinatra::Base
     end 
     
     return user
-  end  
-
-  # no hace falta
-  def create_document(title,type,file_format,description,user_id,path)
-    return Document.new(title: title, type: type, format: file_format, visibility: true, 
-                        description: description, user_id: user_id, path:path, created_at: date_time)
   end  
 
   #para el test
