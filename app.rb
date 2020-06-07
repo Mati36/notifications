@@ -293,6 +293,17 @@ class App < Sinatra::Base
     erb :documents
   end
 
+  get '/topic_list' do
+    @topics = Topic.all
+    erb :topic_list
+  end   
+
+  post '/delete_topic' do
+    topic_id = params["del_topic"]
+    Topic.where(id: topic_id).delete
+    redirect back
+  end  
+
  # metodos 
 
   def date_time 
