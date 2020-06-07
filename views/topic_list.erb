@@ -7,25 +7,53 @@
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     </head>
     <body>
+        <table class="w3-table-all w3-hoverable">
+                   
+            <%@topics.each do |topic|%>
+            <tr class="w3-hoverable"> 
+                <td>    
+                    <span class="w3-large"><%= topic.name %></span><br>
+                
+                </td>
+
+                <form action="" method="POST">
+                  
+                    <%if !Subscription.find(user_id: @current_user.id, topic_id: topic.id) %> 
+                        <td>          
+                            <button class="w3-button w3-blue w3-round-xxlarge w3-center" name="sub_topic" type="submit" value="<%=topic.id%>" 
+                                formaction="/subscription_topic"> Suscribirse </button>      
+                        </td> 
+                    <%else%>  
+                        <td>              
+                            <button class="w3-button w3-red w3-round-xxlarge w3-center" name="sub_topic" type="submit" value="<%=topic.id%>" 
+                                formaction="/del_subscription_topic"> Desuscribirse </button>      
+                        </td> 
+                    <%end%>    
+
+                    <%if @current_user.is_admin%>
+                        <td>
+                            <button class="w3-button w3-white w3-right w3-circle " name="del_topic" type="submit" value="<%=topic.id%>" 
+                                formaction="/delete_topic">&times </button>
+                        </td>
+                    <%end%>       
+                    
+                </form>     
+            </tr>
+            <%end%>  
+            
+                           
+                  
+        </table>
+        
         <div class="w3-container">
             <ul class="w3-card-4 w3-ul">
-                <%@topics.each do |topic|%>
-
-                    <li class="w3-hover-blue w3-padding-16">
-                        <%if @current_user%>
-                        <form action="" method="POST">
-                            <td>  
-                                <button class="w3-bar-item w3-button w3-white w3-right w3-circle w3-center " name="del_topic" type="submit" value="<%=topic.id%>" 
-                                formaction="/delete_topic">&times </button>  
-                            </td>
-                        </form>
-                        <%end%>                  
-                        <div class="w3-bar-item">
-                            <span class="w3-large"><%= topic.name %></span><br>
-                        </div>
+                
+                    <div class="w3-hover-blue">
+                        
+                        
                     </li>
 
-                <%end%>  
+              
             </ul>  
         </div>
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

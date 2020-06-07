@@ -19,7 +19,7 @@ class App < Sinatra::Base
 
   before do 
     #esto no va es solo para el test 
-    test_run(1)
+    test_run(3)
     
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
@@ -303,6 +303,18 @@ class App < Sinatra::Base
     Topic.where(id: topic_id).delete
     redirect back
   end  
+
+  post '/subscription_topic' do
+    topic = Topic.find(id: params["sub_topic"])
+    @current_user.add_topic(topic) 
+    redirect back
+  end  
+
+  post '/del_subscription_topic' do 
+    topic = Topic.find(id: params["sub_topic"])
+    @current_user.remove_topic(topic) 
+    redirect back
+  end   
 
  # metodos 
 
