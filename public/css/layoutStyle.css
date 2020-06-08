@@ -46,10 +46,34 @@
   border-bottom: 1px solid grey;
 }
 
+
 .dropdown{
   position: absolute;
   top: 30%;
   display: none;
+}
+
+.notifList{
+  position: absolute;
+  top: 100%;
+  width: 500%;
+  max-height: 5000%;
+  display: none;
+  background-color: lightblue;
+}
+
+.notifButton{
+  display: list;
+  height: 4%;
+  width: 100%;
+  border-bottom: 1px solid grey;
+}
+
+.notifButton:hover{
+  background-color: brown;
+}
+.notifContainer:active .notifList{
+  display: block;
 }
 
 .menuContainer:hover .dropdown{
@@ -61,17 +85,16 @@
   width: 100%;
 }
 
+.notification{
+  height: 100%;
+  opacity: 0.6;
+}
+
 .adm{
-  color: steelblue
+  color: steelblue;
 }
 
 .menuButton :hover{
-  background-color: steelblue;
-}
-
-.offset{
-  background: linear-gradient(180deg, rgba(152, 194, 202,1) 35%,  rgba(200,200,255,1) 100%);  float: left;
-  width: 10%;
   height: 100%;
 }
 
@@ -105,4 +128,10 @@
 
 .content{
   width: 95%;
+}
+.notifContainer{
+  visibility: visible;
+  position: fixed;
+  top: 12%;
+  right: 12%;
 }

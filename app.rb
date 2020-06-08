@@ -5,11 +5,13 @@ class App < Sinatra::Base
   require './models/init.rb'
   require 'date'
   require 'sinatra-websocket'
+  require 'sinatra/flash'
   include FileUtils::Verbose
-
+  
   configure do 
     enable :logging
     enable :sessions
+    register Sinatra::Flash
     set :sessions_fail, '/'
     set :sessions_secret, "inhakiable papuuu"
     set :sessions_fail, true
@@ -19,20 +21,25 @@ class App < Sinatra::Base
 
   before do 
     #esto no va es solo para el test 
-    test_run(3)
+    test_run(2)
+    
     
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
-   
+    
     if !@current_user && @path != '/login' && @path != '/signUp'
       redirect '/login'
     elsif @current_user
+      
+      @notifications = Tag.where(user_id: @current_user.id, check_notification: false)
+      
       if (@path == '/signUp')
         redirect '/'
       end  
       if (!@current_user.is_admin && (@path == '/save_document' || @path == '/change_role'))
         redirect '/'
       end  
+      
     end
     
   end
@@ -91,6 +98,8 @@ class App < Sinatra::Base
         document.update(path: "/files/#{@id}#{@fileFormat}")
 
         tags_user_document(params["tag"],document)
+        document_add_topic(document, params["topics"])
+        user_add_notification(document)
 
         cp(file.path, @localPath)
         File.chmod(0777, @localPath)
@@ -212,7 +221,7 @@ class App < Sinatra::Base
   end  
 
   post '/add_topic' do
-    new_topic = create_topic(params["topic"])
+    new_topic = Topic.new(name: params["topic"])
     if new_topic.valid?
       new_topic.save
       redirect '/'
@@ -221,8 +230,6 @@ class App < Sinatra::Base
     end      
   end 
 
-
-  ## unificar estos 3 metodos, capaz tengan que ser post
   post '/add_fav' do
     doc_id = params["add_favorite_doc"]
     doc = Document.find(id: doc_id )
@@ -269,7 +276,6 @@ class App < Sinatra::Base
     erb :users_list
   end 
 
-  ## estos tienen que post y delete 
   post '/add_admin' do
     user_id = params["addAdmin_id"]
     user = find_user_id(user_id)
@@ -335,6 +341,19 @@ class App < Sinatra::Base
     end
   end  
 
+  def user_add_notification(document)
+
+    User.exclude(id: @current_user.id).each do |user|
+     
+      if !user.nil? && !Tag.find(user_id: user.id, document_id: document.id)
+        document.topics.each do |topic|
+          user.add_document(document)
+        end   
+      end  
+    end
+
+  end 
+
   def user_cheked_document(document)
     doc = find_document_user(@current_user.id, document.id)
     if doc.nil?
@@ -357,7 +376,7 @@ class App < Sinatra::Base
     doc = find_document_user(@current_user.id, document.id)
     if !doc.nil?
       doc.update(favorite: false)
-      if !doc.tag && !doc.checked
+      if !doc.tag && !doc.checked && doc.check_notification
         @current_user.remove_document(document)
       end 
     end 
@@ -397,13 +416,11 @@ class App < Sinatra::Base
     @current_user.add_topic(topic)
   end 
 
-  def document_add_topic(topic)
+  def document_add_topic(document,topic_id)
+    topic = Topic.find(id: topic_id)
     document.add_topic(topic)
   end 
   
-  def create_topic(name)
-    return Topic.new(name: name)
-  end       
  
   def create_user(name,lastname,dni,email,password)
     user = User.new(name: name, lastname: lastname, dni: dni, 

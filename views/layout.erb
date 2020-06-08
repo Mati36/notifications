@@ -5,6 +5,7 @@
         <meta charset = "utf-8">
         <title>Sistema de Notificaciones UNRC</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
         <link rel="stylesheet" href="/css/layoutStyle.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
     </head>
@@ -13,6 +14,34 @@
             <div class=espacio-escudo>
                 <img src="/images/logounrc.png" class="escudo">
             </div>
+
+            <div class="notifContainer">
+                <button id="btn_notification" value="" onclick="w3_open()" 
+                    class="w3-button w3-circle w3-margin-right notification"> 
+                    <img src="/images/icons/entypo_bell.png">
+                </button>
+                
+                <div class="notifList" id="notifList">
+                    <%@notifications.each do |notif|%>
+                        <%if notif.tag %>
+                         
+                            <div class="notifButton "><a href = '/doc_view/<%=notif.document_id%>'> 
+                            Se le nombro en <%= Document.find(id: notif.document_id).title%> </a> </div> 
+                        
+                        <%else%>
+                        
+                           <%topic = Topic.find(id: Document_topic.find(document_id: notif.document_id).topic_id )%>
+
+                            <div class="notifButton"><a href = '/doc_view/<%=notif.document_id%>'> 
+                                Nuevo documento en <%= topic.name %>
+                            </a> </div> 
+                        
+                        <%end %>
+                    <%end%>
+                </div>
+            </div>
+            
+
             <div class="logoutButton"><a href = '/log_out'> Cerrar Sesion </a> </div>
         </div> 
         <div class="row">
@@ -38,7 +67,6 @@
                                 </div>
                             </div>
                         <%end%>
-                        <!-- <div class="menuButton"><a href = '/log_out'> Cerrar Sesion </a> </div> -->
                     </div>
                 <%end%>
             </div> 
@@ -50,5 +78,19 @@
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+        <script>
+            function w3_open() {
+                
+                var notification = document.getElementById("notifList").style.display
+                
+               var x = document.getElementById("notifList");
+                if (x.style.display === "none") {
+                    x.style.display = "block";
+                } else {
+                    x.style.display = "none";
+                }
+            }
+       
+        </script>
     </body>
 </html>

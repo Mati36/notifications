@@ -4,14 +4,14 @@
         <meta charset = "utf-8">
         <title>profile</title>
         <link rel="stylesheet" href="css/profileStyle.css">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
     </head>
     <body>
-        <div class="avatar">
-            <img src="<%=@user.avatar_path%>" class="picture" style="width:180px;height:180px;"> <br>   
-        </div>
-        
-        <div class="info">
+       
+       <img src="<%=@user.avatar_path%>" class="picture w3-circle" style="width:180px;height:180px;"> <br>   
+       
+       <div class="w3-col m4 l3">
             <h1> <%=@user.name%> <%=@user.lastname%> </h1>
             <h2>DNI: <%=@user.dni%> </h2>
             <h2>Correo Electronico: <%=@user.email%> </h2> <br> <br>

@@ -8,6 +8,7 @@ Sequel.migration do
 			TrueClass       :checked,    					:default => false
 			TrueClass       :favorite,    					:default => false
 			TrueClass       :tag,    						:default => false
+			TrueClass       :check_notification,    		:default => false
 		end
 	end
 	 down do

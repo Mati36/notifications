@@ -16,7 +16,7 @@
                 <input type="text" name="lastname" value= <%=@current_user.lastname%> / data-validation="alphanumeric" > <br>
                 <label for="email">Email</label> 
                 <input type="text" name="email" value= <%=@current_user.email%> / data-validation="email" > <br>   
-                <a href = '/change_password'> Cambiar contraseña </a> 
+                <button name="change_pass" type="submit" formaction="/change_password" formmethod="GET">Cambiar contraseña</button> 
                 <input type="submit" value="Aceptar">  
             </form>   
         </div>
