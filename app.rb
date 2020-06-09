@@ -23,7 +23,6 @@ class App < Sinatra::Base
     #esto no va es solo para el test 
     test_run(2)
     
-    
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
     
@@ -32,7 +31,7 @@ class App < Sinatra::Base
     elsif @current_user
       
       @notifications = Tag.where(user_id: @current_user.id, check_notification: false)
-      
+      @notyf_cant = Tag.where(user_id: @current_user.id, check_notification: false).count
       if (@path == '/signUp')
         redirect '/'
       end  

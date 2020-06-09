@@ -6,8 +6,9 @@
         <title>Sistema de Notificaciones UNRC</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-        <link rel="stylesheet" href="/css/layoutStyle.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+        <link rel="stylesheet" href="/css/layoutStyle.css">
+       
     </head>
     <body>   
         
@@ -19,25 +20,28 @@
             <div class=espacio-escudo>
                 <img src="/images/logounrc.png" class="escudo">
             </div>
-
-            <div class="notifContainer">
-                <button id="btn_notification" value="" onclick="w3_open()" 
-                    class="w3-button w3-circle w3-margin-right notification"> 
-                    <img src="/images/icons/entypo_bell.png">
-                </button>
+            <div class="w3-display-bottomright notifContainer">
                 
-                <div class="notifList" id="notifList">
+                    <div class="w3-container w3-tiny ">
+                        <button onclick="w3_open()" class="w3-button w3-center w3-circle w3-small"> 
+                            <span class="w3-tag w3-red w3-large w3-circle "> <%=@notyf_cant%></span>  
+                            <i class="w3-xxlarge " > 
+                                 <img  src="/images/icons/entypo_bell.png"> </span> </i>
+                        </button>         
+                   </div>
+              
+                <div class="notifList " id="notifList">
                     <%@notifications.each do |notif|%>
                         <%if notif.tag %>
                          
-                            <div class="notifButton "><a href = '/doc_view/<%=notif.document_id%>'> 
+                            <div class="notifSelection "><a href = '/doc_view/<%=notif.document_id%>'> 
                             Se le nombro en <%= Document.find(id: notif.document_id).title%> </a> </div> 
                         
                         <%else%>
                         
                            <%topic = Topic.find(id: Document_topic.find(document_id: notif.document_id).topic_id )%>
 
-                            <div class="notifButton"><a href = '/doc_view/<%=notif.document_id%>'> 
+                            <div class="notifSelection"><a href = '/doc_view/<%=notif.document_id%>'> 
                                 Nuevo documento en <%= topic.name %>
                             </a> </div> 
                         

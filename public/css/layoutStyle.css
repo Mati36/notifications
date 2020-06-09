@@ -60,18 +60,21 @@
   max-height: 5000%;
   display: none;
   background-color: lightblue;
+  color: black;
 }
 
-.notifButton{
-  display: list;
-  height: 4%;
-  width: 100%;
-  border-bottom: 1px solid grey;
+.notifSelection:hover{
+  background-color: black;
+  opacity: 0.3;
+}
+.notifSelection:hover a:hover {
+  color: #fff;
 }
 
 .notifButton:hover{
-  background-color: brown;
+  opacity: 0.2;
 }
+
 .notifContainer:active .notifList{
   display: block;
 }
@@ -95,7 +98,7 @@
 }
 
 .menuButton :hover{
-  height: 100%;
+  background-color: rgba(49, 49, 49, 0.178);
 }
 
 .menu {
@@ -129,9 +132,7 @@
 .content{
   width: 95%;
 }
+
 .notifContainer{
-  visibility: visible;
-  position: fixed;
-  top: 12%;
-  right: 12%;
+  margin-right: 150px;
 }
