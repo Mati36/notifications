@@ -5,7 +5,6 @@ class App < Sinatra::Base
   require './models/init.rb'
   require 'date'
   require 'sinatra-websocket'
-  require 'sinatra/flash'
   include FileUtils::Verbose
   
   configure do 
@@ -21,7 +20,7 @@ class App < Sinatra::Base
 
   before do 
     #esto no va es solo para el test 
-    test_run(2)
+    test_run(1)
     
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
@@ -31,7 +30,7 @@ class App < Sinatra::Base
     elsif @current_user
       
       @notifications = Tag.where(user_id: @current_user.id, check_notification: false)
-      @notyf_cant = Tag.where(user_id: @current_user.id, check_notification: false).count
+   
       if (@path == '/signUp')
         redirect '/'
       end  
@@ -420,7 +419,6 @@ class App < Sinatra::Base
     document.add_topic(topic)
   end 
   
- 
   def create_user(name,lastname,dni,email,password)
     user = User.new(name: name, lastname: lastname, dni: dni, 
                      email: email, password: password, created_at: date_time)  
@@ -430,6 +428,12 @@ class App < Sinatra::Base
     end 
     
     return user
+  end  
+
+  def notifications_checked(notifications)
+    notifications.each do |notification|
+      notification.update(check_notification: true)
+    end
   end  
 
   #para el test
