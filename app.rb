@@ -10,7 +10,6 @@ class App < Sinatra::Base
   configure do 
     enable :logging
     enable :sessions
-    register Sinatra::Flash
     set :sessions_fail, '/'
     set :sessions_secret, "inhakiable papuuu"
     set :sessions_fail, true
@@ -20,7 +19,7 @@ class App < Sinatra::Base
 
   before do 
     #esto no va es solo para el test 
-    test_run(1)
+    test_run(4)
     
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
@@ -29,8 +28,9 @@ class App < Sinatra::Base
       redirect '/login'
     elsif @current_user
       
-      @notifications = Tag.where(user_id: @current_user.id, check_notification: false)
-   
+      @notifications = Tag.where(user_id: @current_user.id)
+      @newNotif = 0;
+      #notifications_checked(@notifications)
       if (@path == '/signUp')
         redirect '/'
       end  
@@ -320,6 +320,16 @@ class App < Sinatra::Base
     redirect back
   end   
 
+  get '/notifications' do
+    erb :notifications
+  end
+ 
+  post '/notifications' do
+    @notifications.each do |notification|
+      notification.update(check_notification: true)
+    end
+  end  
+
  # metodos 
 
   def date_time 
@@ -334,22 +344,21 @@ class App < Sinatra::Base
       if !user_dni.empty?
         user = find_user_dni(user_dni)
         user.add_document(document)
-        Tag.last.update(tag: true) 
+        Tag.find(user_id: user.id, document_id: document.id).update(tag: true)
       end  
     end
   end  
 
   def user_add_notification(document)
-
     User.exclude(id: @current_user.id).each do |user|
-     
       if !user.nil? && !Tag.find(user_id: user.id, document_id: document.id)
         document.topics.each do |topic|
-          user.add_document(document)
+          if Subscription.find(user_id: user.id, topic_id: topic.id)
+            user.add_document(document)
+          end
         end   
       end  
     end
-
   end 
 
   def user_cheked_document(document)
@@ -416,7 +425,9 @@ class App < Sinatra::Base
 
   def document_add_topic(document,topic_id)
     topic = Topic.find(id: topic_id)
-    document.add_topic(topic)
+    if(topic)
+      document.add_topic(topic)
+    end
   end 
   
   def create_user(name,lastname,dni,email,password)
