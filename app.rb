@@ -18,8 +18,8 @@ class App < Sinatra::Base
   end 
 
   before do 
-    #esto no va es solo para el test 
-    test_run(2)
+    #esto no va, es solo para el test 
+    #  test_run(2)
     
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
@@ -28,10 +28,9 @@ class App < Sinatra::Base
       redirect '/login'
     elsif @current_user
       
-      @notifications = Tag.where(user_id: @current_user.id)
-      @newNotif = 0;
-      #notifications_checked(@notifications)
-      if (@path == '/signUp')
+      @notifications = get_notification
+      
+     if (@path == '/signUp')
         redirect '/'
       end  
       if (!@current_user.is_admin && (@path == '/save_document' || @path == '/change_role'))
@@ -43,8 +42,36 @@ class App < Sinatra::Base
   end
 
   get "/" do
-    erb :index
+    if !request.websocket?
+      erb :index
+    else
+      request.websocket do |ws|
+        ws_open(ws) 
+      end
+      
+    end
+
   end
+
+   
+  def ws_open(ws)
+    ws.onopen do
+      @connection = {socket: ws}
+      settings.sockets << @connection
+    end
+  end  
+  
+  def ws_close(ws)
+    consola("close","")
+    ws.onclose do
+      settings.sockets.delete(ws)
+    end
+  end  
+  
+  def ws_msj(msg)
+    consola("msg= ",msg)
+    EM.next_tick { settings.sockets.each { |s| s[:socket].send(msg.to_s)} }
+  end  
 
   post '/signUp' do
     request.body.rewind 
@@ -78,8 +105,8 @@ class App < Sinatra::Base
   end
 
   post '/save_document' do
-    
-    if(params[:fileInput])
+   
+   if(params[:fileInput])
       file = params[:fileInput] [:tempfile]
       @fileFormat = File.extname(file)
       @directory = "public/files/"
@@ -98,7 +125,7 @@ class App < Sinatra::Base
         tags_user_document(params["tag"],document)
         document_add_topic(document, params["topics"])
         user_add_notification(document)
-
+        
         cp(file.path, @localPath)
         File.chmod(0777, @localPath)
         redirect '/'
@@ -108,7 +135,7 @@ class App < Sinatra::Base
       end 
      
     else
-      redirect '/save_document'
+      redirect '/index'
     end 
   end
 
@@ -302,11 +329,6 @@ class App < Sinatra::Base
     erb :topic_list
   end   
 
-  get '/list_document_topic/:id' do
-    @documents = Document.join(Document_topic.where(topic_id: params[:id]), document_id: :id).order(:created_at).reverse
-    erb :documents
-  end  
-
   post '/delete_topic' do
     topic_id = params["del_topic"]
     Topic.where(id: topic_id).delete
@@ -324,6 +346,11 @@ class App < Sinatra::Base
     @current_user.remove_topic(topic) 
     redirect back
   end   
+
+  get '/list_document_topic/:id' do
+    @documents = Document.join(Document_topic.where(topic_id: params[:id]), document_id: :id).order(:created_at).reverse
+    erb :documents
+  end  
 
   get '/notifications' do
     erb :notifications
@@ -350,6 +377,8 @@ class App < Sinatra::Base
         user = find_user_dni(user_dni)
         user.add_document(document)
         Tag.find(user_id: user.id, document_id: document.id).update(tag: true)
+        consola("cant",get_notification_count(user.id))
+        ws_msj(get_notification_count(user.id)) 
       end  
     end
   end  
@@ -360,6 +389,7 @@ class App < Sinatra::Base
         document.topics.each do |topic|
           if Subscription.find(user_id: user.id, topic_id: topic.id)
             user.add_document(document)
+            ws_msj(get_notification_count(user.id)) 
           end
         end   
       end  
@@ -452,6 +482,23 @@ class App < Sinatra::Base
     end
   end  
 
+  def notification_count() 
+    
+    get_notification.each do |notif|
+      if !notif.check_notification
+          @newNotif = @newNotif + 1
+      end
+    end
+    return @newNotif
+  end  
+
+  def get_notification
+    Tag.where(user_id: @current_user.id)
+  end  
+
+  def get_notification_count(user_id)
+    Tag.where(user_id: user_id, check_notification: false).count
+  end
   #para el test
   
   def consola(ms,var)
@@ -472,38 +519,20 @@ class App < Sinatra::Base
       session[:user_id] = User[id].id
   end 
   
-  get "/ws" do
-    if !request.websocket?
-      erb :socket
-    else
+  # get "/ws" do
+  #   if !request.websocket?
+  #     erb :index
+  #   else
      
-      request.websocket do |ws|
-        ws_open(ws) 
-        ws_msj(ws) 
-        ws_close(ws)
-      end
+  #     request.websocket do |ws|
+  #       ws_open(ws) 
+  #       ws_msj(ws) 
+  #       ws_close(ws)
+  #     end
    
-    end
-  end 
-  
-  def ws_open(ws)
-    ws.onopen do
-      settings.sockets << ws
-    end
-  end  
-  
-  def ws_close(ws)
-    ws.onclose do
-      settings.sockets.delete(ws)
-    end
-  end  
-  
-  def ws_msj(ws)
-    ws.onmessage do |msg|
-      ms = @current_user.name + " --> " +msg
-      EM.next_tick { settings.sockets.each {|s| s.send(ms) } }
-    end
-  end  
+  #   end
+  # end 
+ 
   
 end
 

@@ -11,25 +11,33 @@
                    
             <%@notifications.each do |notif|%>
                     <%@doc = Document.find(id: notif.document_id)%>
+                    <% document_topic = Document_topic.find(document_id: notif.document_id)%>
+                    <% if document_topic
+                            topic = Topic.find(id: document_topic.topic_id) 
+                       end  
+                    %>
+
                     <%if notif.checked %>
                         <tr id="row" class="w3-grey">    
                     <%else%>
                         <tr id="row">      
                     <%end%> 
-                <td>    
+               
                     <%if notif.tag %>  
+                     <td>    
                         <div class="notifSelection "><a href = '/doc_view/<%=notif.document_id%> ' target="_blank" > 
                             Se le nombro en el documento: <%= @doc.title%>  <br>
                             <%= @doc.description%>
                         </a> </div>
-                    <%else%>
-                       <%topic = Topic.find(id: Document_topic.find(document_id: notif.document_id).topic_id )%>
-                        <div class="notifSelection"><a href = '/doc_view/<%=notif.document_id%>' target="_blank" > 
-                            Nueva publicacion en la tendencia: <%= topic.name %>. Documento: <%= @doc.title%> <br>
-                            <%= @doc.description%>
-                        </a> </div> 
+                    <%elsif  topic  
+                        if Subscription.find(user_id:@current_user.id, topic_id:topic.id) %>
+                            <div class="notifSelection"><a href = '/doc_view/<%=notif.document_id%>' target="_blank" > 
+                                Nueva publicacion en la tendencia: <%= topic.name %>. Documento: <%= @doc.title%> <br>
+                                <%= @doc.description%>
+                            </a> </div> 
+                        <%end %>
+                     </td>       
                     <%end %>
-                </td>    
             </tr>
             <%end%>  
             

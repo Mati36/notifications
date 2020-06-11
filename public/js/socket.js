@@ -1,21 +1,18 @@
 
-console.log("socket")
-
- window.onload = function(){
-    const ws  = new WebSocket('ws://' + window.location.host + window.location.pathname);
-    
+window.onload = function(){
+  
+    const ws  = new WebSocket('ws://' + window.location.host );
+    this.console.log(ws)
     var show =  function(el){
-                  return msg => { el.innerHTML = msg + '<br />' + el.innerHTML; }
-      
-                }(document.getElementById('msg'));
-
+                  return msg => { el.innerHTML = msg; }
+                }(document.getElementById('notification'));
 
     ws.onopen = () => {console.log('conectado'); }
-
+ 
     ws.onmessage = e => {
       msj = e.data;
       show(e.data)
-      console.log(msj);
+      console.log('update');
     }
 
     ws.onclose = e => {
@@ -25,16 +22,16 @@ console.log("socket")
     
     ws.onerror = e => { console.log('erro:'+e); }
 
-    this.inputReset(ws);
-}
-
-function inputReset(ws) {
-  var input = document.getElementById('input');
-  input.addEventListener('click', () => { input.value = '' } );
-  var form = document.getElementById('form');
-  form.onsubmit = e => {
-    ws.send(input.value);
-    input.value = "Escribe algo..";
-    return false;
-  }
+    function inputReset(ws) {
+      var btn_notification = document.getElementById('btn_notyf');
+      btn_notification.addEventListener('click', e => {
+        var notification = (document.getElementById('notification'));
+        console.log('anda')
+        notification.innerHTML = '0'  
+        ws.send('0');
+      })
+      return false;
+      
+    }
+   
 }

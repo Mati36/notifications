@@ -1,7 +1,7 @@
 require "bundler"
 require "sinatra"
 require 'sequel'
-
+require 'sinatra-websocket'
 
 Bundler.require
 

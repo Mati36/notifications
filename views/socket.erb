@@ -2,13 +2,29 @@
   <head>
       <meta charset = "utf-8">
       <title>Web socket</title>
+      <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+        <link rel="stylesheet" href="/css/layoutStyle.css">
       <script type="text/javascript" src="js/socket.js"></script>
   </head>
   <body>
-     <h1>Test de web socket</h1>
-     <form id="form">
-       <input type="text" id="input" value="Escribe algo.."></input>
-     </form>
-     <div id="msg"></div>
-  </body>
+    <%if @current_user%>
+      
+      <div class="w3-display-bottomright notifContainer">
+        <div class="w3-container w3-tiny ">
+            <form id="form" action="/notifications" method="GET">
+              <button type="submit" id="btn_notyf" class="w3-button w3-center w3-circle w3-small" > 
+                <span name="span"  id="notification" class="w3-tag w3-red w3-large w3-circle "><%=get_notification_count(@current_user.id)%></span>              
+                  <%# <span id="notyf" class="w3-tag w3-red w3-large w3-circle "></span>%>
+                  <i class="w3-xxlarge " > 
+                      <img  src="/images/icons/entypo_bell.png"> </span> </i>
+              </button>    
+            </form>
+        </div>
+      </div>
+<%end%>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+   </body>
 </html>
