@@ -12,8 +12,8 @@
             <%@topics.each do |topic|%>
             <tr class="w3-hoverable"> 
                 <td>    
-                    <span class="w3-large"><%= topic.name %></span><br>
-                
+                   <!-- <span class="w3-large"><%= topic.name %></span><br> -->
+                    <span class="w3-large"><td><a href ='/list_document_topic/<%=topic.id%>' ><%=topic.name%></a< /span><br>                
                 </td>
 
                 <form action="" method="POST">

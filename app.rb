@@ -19,7 +19,7 @@ class App < Sinatra::Base
 
   before do 
     #esto no va es solo para el test 
-    test_run(4)
+    test_run(2)
     
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
@@ -301,6 +301,11 @@ class App < Sinatra::Base
     @topics = Topic.all
     erb :topic_list
   end   
+
+  get '/list_document_topic/:id' do
+    @documents = Document.join(Document_topic.where(topic_id: params[:id]), document_id: :id).order(:created_at).reverse
+    erb :documents
+  end  
 
   post '/delete_topic' do
     topic_id = params["del_topic"]

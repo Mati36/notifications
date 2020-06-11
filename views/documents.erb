@@ -7,12 +7,13 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
     </head>
     <body>
-        <div class="documents">
-           <table id="docs">
-                <tr>
+        
+           <table class="w3-table-all w3-hoverable w3-card-4">
+                <tr class="w3-blue" >
                   <th>Titulo</th>
                   <th>Fecha de subida</th>
                   <th>Descripcion</th>
+                  <th></th>
                     <% if @current_user.is_admin %>
                         <th></th>
                     <% end %> 
@@ -23,12 +24,12 @@
                     #hacer mas optimas estas validaciones 
                     if doc 
                         if doc.checked %>
-                            <tr id="row" style="background-color:#838383">    
+                            <tr id="row" class="w3-hover-cyan w3-grey">    
                         <%else%>
-                            <tr id="row">      
-                            <%end%>
+                            <tr id="row" class="w3-hover-light-blue w3-light-grey">      
+                        <%end%>
                     <%else%>
-                        <tr id="row">  
+                        <tr id="row" class="w3-hover-light-blue w3-light-grey">  
                     <%end%>  
                     <% if document.visibility %>   
                         <form action="" method="POST">
@@ -49,7 +50,7 @@
                     </tr>       
                 <%end%>
             </table>
-        </div>
+        
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
