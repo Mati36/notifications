@@ -3,8 +3,8 @@ class Document < Sequel::Model
   plugin :validation_helpers
   def validate
     super
-    validates_presence [:title, :type, :format, :visibility, :path, :created_at], message: 'Datos en blancos o vacios'
-    validates_unique [:path], message: 'Documeto repetido'
+    validates_presence [:title, :type, :format, :visibility, :path], message: 'Datos en blanco o vacios'
+    validates_unique [:path], message: 'Documento repetido'
   end
   
   #Relations

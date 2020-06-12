@@ -9,7 +9,8 @@ Sequel.migration do
       String          :path,          null: false
       String          :description
       foreign_key     :user_id,       :users 
-      DateTime        :created_at,     null: false
+      DateTime        :created_at,    default: Sequel::CURRENT_TIMESTAMP
+      DateTime        :updated_at,    default: Sequel::CURRENT_TIMESTAMP
     end 
   end                                                                                                          
   

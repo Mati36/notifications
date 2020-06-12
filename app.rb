@@ -19,7 +19,7 @@ class App < Sinatra::Base
 
   before do 
     #esto no va, es solo para el test 
-    #  test_run(2)
+      test_run(1)
     
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
@@ -114,7 +114,7 @@ class App < Sinatra::Base
       
       document = Document.new(title: params["title"], type: params["type"], format: @fileFormat,
                               description: params["description"], user_id: @current_user.id, 
-                              path: @directory_temp, visibility: true, created_at: date_time)
+                              path: @directory_temp, visibility: true)
 
       if document.valid?
         document.save
@@ -171,6 +171,8 @@ class App < Sinatra::Base
   get '/doc_view/:id' do
     doc_id =  params[:id].to_i
     @document = Document.find(id: doc_id)
+    @tagged = Tag.where(document_id: doc_id, tag: true)
+    @topics = Document_topic.where(document_id: doc_id)
     user_cheked_document(@document)
     erb :doc_view, :layout => false 
   end
@@ -375,9 +377,10 @@ class App < Sinatra::Base
      
       if !user_dni.empty?
         user = find_user_dni(user_dni)
-        user.add_document(document)
-        Tag.find(user_id: user.id, document_id: document.id).update(tag: true)
-        consola("cant",get_notification_count(user.id))
+        if !Tag.find(user_id: user.id, document_id: document.id)
+          user.add_document(document)
+        end
+        Tag.find(user_id: user.id, document_id: document.id).update(tag: true, check_notification: false)
         ws_msj(get_notification_count(user.id)) 
       end  
     end
@@ -387,6 +390,7 @@ class App < Sinatra::Base
     User.exclude(id: @current_user.id).each do |user|
       if !user.nil? && !Tag.find(user_id: user.id, document_id: document.id)
         document.topics.each do |topic|
+          #Revisar con mas de un tag (Si se repiten relaciones)!!
           if Subscription.find(user_id: user.id, topic_id: topic.id)
             user.add_document(document)
             ws_msj(get_notification_count(user.id)) 
@@ -400,9 +404,9 @@ class App < Sinatra::Base
     doc = find_document_user(@current_user.id, document.id)
     if doc.nil?
       @current_user.add_document(document)
-      doc = Tag.last
+      doc = find_document_user(@current_user.id, document.id)
     end 
-      doc.update(checked: true)
+      doc.update(checked: true, check_notification: true)
   end 
 
   def user_add_favorite_document(document)

@@ -1,0 +1,33 @@
+.document{
+    width: 80%;
+    height: 100%;
+    position: absolute;
+    right: 0%;
+}
+
+.doc{
+    height: 100%;
+    width: 100%;
+}
+
+.lateralPane{
+    width: 20%;
+    height: 100%;
+    position: absolute;
+    left: 0%;
+    border-right: 2px solid aquamarine;
+}
+
+.content{
+    padding-top: 5%;
+    padding-left: 5%;
+}
+
+.escudo{
+    padding-left: 1%;
+    padding-top: 1%;
+}
+
+.header{
+    background-color: aquamarine;
+}

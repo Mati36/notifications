@@ -24,20 +24,21 @@
                     <%end%> 
                
                     <%if notif.tag %>  
-                     <td>    
+                    <td>    
                         <div class="notifSelection "><a href = '/doc_view/<%=notif.document_id%> ' target="_blank" > 
                             Se le nombro en el documento: <%= @doc.title%>  <br>
                             <%= @doc.description%>
                         </a> </div>
-                    <%elsif  topic  
-                        if Subscription.find(user_id:@current_user.id, topic_id:topic.id) %>
+                    <%elsif  topic%> 
+                    <td> 
+                        <%if Subscription.find(user_id:@current_user.id, topic_id:topic.id) %>
                             <div class="notifSelection"><a href = '/doc_view/<%=notif.document_id%>' target="_blank" > 
                                 Nueva publicacion en la tendencia: <%= topic.name %>. Documento: <%= @doc.title%> <br>
                                 <%= @doc.description%>
                             </a> </div> 
                         <%end %>
-                     </td>       
                     <%end %>
+                    </td>   
             </tr>
             <%end%>  
             
