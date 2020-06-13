@@ -5,6 +5,8 @@ class App < Sinatra::Base
   require './models/init.rb'
   require 'date'
   require 'sinatra-websocket'
+  require 'bcrypt'
+  include BCrypt
   include FileUtils::Verbose
   
   configure do 
@@ -19,8 +21,7 @@ class App < Sinatra::Base
 
   before do 
     #esto no va, es solo para el test 
-      test_run(1)
-    
+    test_run(1)
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
     
@@ -36,9 +37,7 @@ class App < Sinatra::Base
       if (!@current_user.is_admin && (@path == '/save_document' || @path == '/change_role'))
         redirect '/'
       end  
-      
     end
-    
   end
 
   get "/" do
@@ -48,26 +47,16 @@ class App < Sinatra::Base
       request.websocket do |ws|
         ws_open(ws) 
       end
-      
     end
-
   end
 
-   
   def ws_open(ws)
     ws.onopen do
       @connection = {socket: ws}
       settings.sockets << @connection
     end
   end  
-  
-  def ws_close(ws)
-    consola("close","")
-    ws.onclose do
-      settings.sockets.delete(ws)
-    end
-  end  
-  
+
   def ws_msj(msg)
     consola("msg= ",msg)
     EM.next_tick { settings.sockets.each { |s| s[:socket].send(msg.to_s)} }
@@ -154,7 +143,7 @@ class App < Sinatra::Base
   post '/login' do
     user = find_user_email(params['email'])
     
-    if user && user.password == params['pwd']
+    if user && BCrypt::Password.new(user.password) == params['pwd']
       session[:user_id] = user.id
       redirect '/'
     else
@@ -231,9 +220,11 @@ class App < Sinatra::Base
   end  
 
   post '/change_password' do 
-    if (params["current_pass"] == @current_user.password)
-      if (params["pass1"] == params["pass2"])
-        @current_user.update(password: params["pass1"])
+    new_pwd = params["pass1"] 
+    rep_new_pwd = params["pass2"]
+    if correct_password(params["current_pass"]) 
+      if new_pwd == rep_new_pwd 
+        @current_user.update( password: encrypt_password(new_pwd) )
         redirect '/edit_profile'
       else
         redirect '/change_password'
@@ -370,6 +361,14 @@ class App < Sinatra::Base
    return DateTime.now.strftime("%m/%d/%Y: %T")
   end  
  
+  def correct_password(password) 
+    return BCrypt::Password.new(@current_user.password) == password
+  end   
+
+  def encrypt_password(password) 
+    return BCrypt::Password.create(password,:cost => 4)
+  end  
+
   # este metodo taggea a los usuarios con el documento
   def tags_user_document(tags_user, document) 
     users = get_tags(tags_user)
@@ -471,7 +470,7 @@ class App < Sinatra::Base
   
   def create_user(name,lastname,dni,email,password)
     user = User.new(name: name, lastname: lastname, dni: dni, 
-                     email: email, password: password, created_at: date_time)  
+                     email: email, password: encrypt_password(password))  
 
     if (User.all.length <= 0)
       user.update(is_admin: true)
@@ -510,10 +509,11 @@ class App < Sinatra::Base
   end  
   
   def upload_users_test(session_user)
-      create_user("Nuevo","Administrador",40277610,"admin@gmail.com","1").save
-      create_user("Matias","Lopez",40277612,"mati@gmail.com","1").save
-      create_user("Facundo","Fernandez",40277613,"facu@gmail.com","1").save
-      create_user("Nahuel","Filippa",40277614,"nahuel@gmail.com","1").save
+    pwd = "1"
+    create_user("Nuevo","Administrador",40277610,"admin@gmail.com",pwd).save
+    create_user("Matias","Lopez",40277612,"mati@gmail.com",pwd).save
+    create_user("Facundo","Fernandez",40277613,"facu@gmail.com",pwd).save
+    create_user("Nahuel","Filippa",40277614,"nahuel@gmail.com",pwd).save
   end  
 
   def test_run(id)
@@ -522,21 +522,5 @@ class App < Sinatra::Base
       end  
       session[:user_id] = User[id].id
   end 
-  
-  # get "/ws" do
-  #   if !request.websocket?
-  #     erb :index
-  #   else
-     
-  #     request.websocket do |ws|
-  #       ws_open(ws) 
-  #       ws_msj(ws) 
-  #       ws_close(ws)
-  #     end
-   
-  #   end
-  # end 
- 
-  
-end
 
+end

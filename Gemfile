@@ -6,7 +6,7 @@ gem 'sequel'
 gem 'pg'
 gem 'sinatra-websocket'
 gem 'thin' 
-#gem 'puma', '4.3.3' # 
+gem 'bcrypt', '~> 3.1', '>= 3.1.11'
 
 group :development do
   gem 'dotenv', '2.7.5'

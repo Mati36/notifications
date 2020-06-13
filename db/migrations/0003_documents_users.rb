@@ -9,6 +9,8 @@ Sequel.migration do
 			TrueClass       :favorite,    					:default => false
 			TrueClass       :tag,    						:default => false
 			TrueClass       :check_notification,    		:default => false
+			DateTime        :created_at,    				default: Sequel::CURRENT_TIMESTAMP
+      		DateTime        :updated_at,    				default: Sequel::CURRENT_TIMESTAMP
 		end
 	end
 	 down do
