@@ -34,7 +34,7 @@ class App < Sinatra::Base
      if (@path == '/signUp')
         redirect '/'
       end  
-      if (!@current_user.is_admin && (@path == '/save_document' || @path == '/change_role'))
+      if (!@current_user.is_admin && (@path == '/save_document' || @path == '/change_role' || @path == '/edit_document/:id'))
         redirect '/'
       end  
     end
@@ -354,6 +354,24 @@ class App < Sinatra::Base
       notification.update(check_notification: true)
     end
   end  
+
+  get '/edit_document/:id' do 
+    erb :edit_document
+  end
+
+  post '/edit_document/:id' do
+    doc_id =  params[:id].to_i
+    @document = Document.find(id: doc_id)
+    if params["title"].empty? || params["description"].empty?
+      path = request.path_info
+      redirect path
+    else
+      @document.update(title: params["title"], description: params["description"])
+      newTags = params["newTags"]
+      tags_user_document(newTags, @document)
+      redirect '/doc_view/'+doc_id.to_s
+    end 
+  end
 
  # metodos 
 
