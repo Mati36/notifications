@@ -1,5 +1,5 @@
 class User < Sequel::Model
-  plugin :validation_helpers
+  plugin :validation_helpers 
   
   def validate
     super
@@ -18,5 +18,15 @@ class User < Sequel::Model
   #to topic
   one_to_many :topics_users
   many_to_many :topics
-    
+
+  dataset_module do
+    def correct_password(user,password) 
+      return BCrypt::Password.new(user.password) == password
+    end   
+
+    def encrypt_password(password) 
+      return BCrypt::Password.create(password,:cost => 4)
+    end  
+
+  end
 end

@@ -21,7 +21,7 @@ class App < Sinatra::Base
 
   before do 
     #esto no va, es solo para el test 
-    test_run(1)
+    #test_run(1)
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
     
@@ -143,7 +143,7 @@ class App < Sinatra::Base
   post '/login' do
     user = find_user_email(params['email'])
     
-    if user && BCrypt::Password.new(user.password) == params['pwd']
+    if user && User.correct_password(user,params['pwd'])  
       session[:user_id] = user.id
       redirect '/'
     else
@@ -222,9 +222,9 @@ class App < Sinatra::Base
   post '/change_password' do 
     new_pwd = params["pass1"] 
     rep_new_pwd = params["pass2"]
-    if correct_password(params["current_pass"]) 
+    if User.correct_password(@current_user, params["current_pass"]) 
       if new_pwd == rep_new_pwd 
-        @current_user.update( password: encrypt_password(new_pwd) )
+        @current_user.update( password: User.encrypt_password(new_pwd) )
         redirect '/edit_profile'
       else
         redirect '/change_password'
@@ -360,14 +360,6 @@ class App < Sinatra::Base
   def date_time 
    return DateTime.now.strftime("%m/%d/%Y: %T")
   end  
- 
-  def correct_password(password) 
-    return BCrypt::Password.new(@current_user.password) == password
-  end   
-
-  def encrypt_password(password) 
-    return BCrypt::Password.create(password,:cost => 4)
-  end  
 
   # este metodo taggea a los usuarios con el documento
   def tags_user_document(tags_user, document) 
@@ -470,7 +462,7 @@ class App < Sinatra::Base
   
   def create_user(name,lastname,dni,email,password)
     user = User.new(name: name, lastname: lastname, dni: dni, 
-                     email: email, password: encrypt_password(password))  
+                     email: email, password: User.encrypt_password(password))  
 
     if (User.all.length <= 0)
       user.update(is_admin: true)
