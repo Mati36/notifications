@@ -157,6 +157,18 @@ class App < Sinatra::Base
     erb :documents
   end
 
+  post '/choose_type' do
+    type = params["type"]
+    if type == "Act"
+      @documents = Document.where(type: "Act").order(:created_at).reverse
+    elsif  type == "Resolution"
+      @documents = Document.where(type: "Resolution").order(:created_at).reverse
+    else
+      @documents = Document.order(:created_at).reverse
+    end  
+    erb :documents
+  end  
+
   get '/doc_view/:id' do
     doc_id =  params[:id].to_i
     @document = Document.find(id: doc_id)

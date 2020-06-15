@@ -7,7 +7,15 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
     </head>
     <body>
-        
+            <form action="" method="POST">
+                <label for="type">Tipo</label>
+                <select id="type" name="type">
+                    <option value="All">Todas</option> 
+                    <option value="Act">Acta</option>
+                    <option value="Resolution">Resolucion</option>
+                </select> 
+                <button name="filter_type" type="submit" formaction="/choose_type">Filtrar</button>
+            </form>    
            <table class="w3-table-all w3-hoverable w3-card-4">
                 <tr class="w3-blue" >
                   <th>Titulo</th>
@@ -18,7 +26,6 @@
                         <th></th>
                     <% end %> 
                 </tr>
-
                 <%@documents.each do |document| 
                     doc = find_document_user(@current_user.id, document.id)
                     #hacer mas optimas estas validaciones 
@@ -45,6 +52,7 @@
                             <% if @current_user.is_admin %>   
                                 <td><button name="delete_doc" type="submit" value="<%=document.id%>" formaction="/delete_doc">Eliminar</button> </td>
                             <% end %>
+                            
                         </form>  
                     <% end %>  
                     </tr>       
