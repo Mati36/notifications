@@ -44,13 +44,12 @@
 
             search.innerHTML = '';
             search.addEventListener('keyup',e => {
+                var lastChar = select_user.join('').length;    
+                var text = search.value.charAt(lastChar);
+               
+                if (search.value.length < lastChar)
+                   deselect(select_user);
                 
-                var text = search.value.charAt(select_user.length);
-                console.log("texto "+text.toString());
-                
-                if (search.value.length < select_user.join('').length){
-                    deselect(select_user);}
-
                 user_ul.innerHTML = '';
                 if (text != ''){
                     
@@ -77,13 +76,11 @@
                         }); 
                     }
                 }
-                else
-                    select_user = [];
+                
             });
             
             function deselect(select_user) {
-                if (search.value.toString().indexOf('@') > -1)
-                    select_user.pop(select_user.length - 1);
+                select_user.pop();
             }
       
         </script>
