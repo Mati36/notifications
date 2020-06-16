@@ -15,7 +15,11 @@
                 <label for="description">Descripcion</label> 
                 <input type="text" name="description"> <br>
                 <label for="tag" >Tags</label> 
-                <input type="text" name="tag"> <br>
+                <input type="text" name="tag" id="tag">
+                <div name="name_user" id="tag_name_user" class="w3-large ">
+                    <ul id="filter_users"> 
+                    </ul>
+                </div> <br>
                 <label for="type" >Tipo</label> 
                 <select id="type" name="type"> 
                     <option value="Act">Acta</option>
@@ -31,8 +35,57 @@
                 <input type="submit" value="Subir Documento"> 
             </form>
         </div>
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+        <script> 
+            users = <%= @users%>;
+             
+            var search = document.getElementById('tag');
+            var user_ul = document.getElementById('filter_users');
+            var select_user=[];
+
+            search.innerHTML = '';
+            search.addEventListener('keyup',e => {
+                
+                var text = search.value.charAt(select_user.length);
+                console.log("texto "+text.toString());
+                
+                if (search.value.length < select_user.join('').length){
+                    deselect(select_user);}
+
+                user_ul.innerHTML = '';
+                if (text != ''){
+                    
+                    var users_list = users.filter( function (user) {
+                        return (user.dni.toString().indexOf(text) > -1)
+                    });
+
+                    for (let i = 0; i < users_list.length; i++) {
+                        
+                        user_ul.innerHTML += ` <li id='user_${i}' class="w3-hover-light-green" >
+                                                    ${ users_list[i].name } ${users_list[i].lastname}
+                                                    (${users_list[i].dni})
+                                                </li> `;
+                    }
+
+                    for (let i = 0; i < users_list.length; i++) {
+                        document.getElementById('user_'+i).addEventListener('click', e=> {
+                            select_user.push('@' + users_list[i].dni.toString());
+                            search.value ='';
+                            for (let i = 0; i < select_user.length; i++) {
+                                search.value += select_user[i];    
+                            }
+                            user_ul.innerHTML = '';
+                        }); 
+                    }
+                }
+                else
+                    select_user = [];
+            });
+            
+            function deselect(select_user) {
+                if (search.value.toString().indexOf('@') > -1)
+                    select_user.pop(select_user.length - 1);
+            }
+      
+        </script>
     </body>
 </html>

@@ -21,7 +21,7 @@ class App < Sinatra::Base
 
   before do 
     #esto no va, es solo para el test 
-    #test_run(1)
+    # test_run(1)
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
     
@@ -58,7 +58,6 @@ class App < Sinatra::Base
   end  
 
   def ws_msj(msg)
-    consola("msg= ",msg)
     EM.next_tick { settings.sockets.each { |s| s[:socket].send(msg.to_s)} }
   end  
 
@@ -90,6 +89,7 @@ class App < Sinatra::Base
 
   get '/save_document' do 
     @topics = Topic.all 
+    @users  = User.exclude(id: @current_user.id).map{|x| x.to_hash}.to_json
     erb :save_document
   end
 
@@ -436,13 +436,13 @@ class App < Sinatra::Base
       @current_user.add_document(document)
       doc = find_document_user(@current_user.id, document.id)
     end 
-      doc.update(favorite: true)
+      doc.update(favorite: true,check_notification: true)
   end 
 
   def user_del_favorite_document(document)
     doc = find_document_user(@current_user.id, document.id)
     if !doc.nil?
-      doc.update(favorite: false)
+      doc.update(favorite: false,check_notification: true)
       if !doc.tag && !doc.checked && doc.check_notification
         @current_user.remove_document(document)
       end 
@@ -518,7 +518,7 @@ class App < Sinatra::Base
   end  
 
   def get_notification
-    Tag.where(user_id: @current_user.id)
+    Tag.where(user_id: @current_user.id).order(:created_at).reverse
   end  
 
   def get_notification_count(user_id)
