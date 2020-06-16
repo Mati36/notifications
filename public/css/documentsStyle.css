@@ -1,3 +1,11 @@
+.filter{
+  position: absolute;
+  background-color: white; 
+}
+.user-filter{
+  width:50%;
+}
+
 #docs {
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
     border-collapse: collapse;
@@ -18,4 +26,3 @@
     color: white;
   }
 
-  

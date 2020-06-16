@@ -124,7 +124,7 @@ class App < Sinatra::Base
       end 
      
     else
-      redirect '/index'
+      redirect '/save_document'
     end 
   end
 

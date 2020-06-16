@@ -4,8 +4,7 @@
         <meta charset = "utf-8">
         <title>save_document</title>
         <link rel="stylesheet" href="css/loginStyle.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-
+        <link rel="stylesheet" href="css/documentsStyle.css">
     </head>
     <body>
         <div class="save_document">
@@ -16,10 +15,10 @@
                 <input type="text" name="description"> <br>
                 <label for="tag" >Tags</label> 
                 <input type="text" name="tag" id="tag">
-                <div name="name_user" id="tag_name_user" class="w3-large ">
-                    <ul id="filter_users"> 
-                    </ul>
-                </div> <br>
+                
+                <div class="filter w3-round-large ">
+                    <ul id="filter_users" class="w3-ul w3-card w3-border w3-round-large " > </ul>
+                </div>
                 <label for="type" >Tipo</label> 
                 <select id="type" name="type"> 
                     <option value="Act">Acta</option>
@@ -45,7 +44,7 @@
             search.innerHTML = '';
             search.addEventListener('keyup',e => {
                 var lastChar = select_user.join('').length;    
-                var text = search.value.charAt(lastChar);
+                var text = search.value.substr(lastChar);
                
                 if (search.value.length < lastChar)
                    deselect(select_user);
@@ -54,14 +53,34 @@
                 if (text != ''){
                     
                     var users_list = users.filter( function (user) {
-                        return (user.dni.toString().indexOf(text) > -1)
+                        input_text = lowerCase(text);
+                        fullName = (user.name+' '+user.lastname).toLowerCase();
+                        email = lowerCase(user.email);
+                        return (isUser(user.dni,input_text) || isUser(user.name,input_text) 
+                                    || isUser(user.lastname,input_text) || isUser(fullName,input_text) 
+                                    || isUser(user.email,input_text)
+                                );
+                                
                     });
 
                     for (let i = 0; i < users_list.length; i++) {
-                        
-                        user_ul.innerHTML += ` <li id='user_${i}' class="w3-hover-light-green" >
-                                                    ${ users_list[i].name } ${users_list[i].lastname}
-                                                    (${users_list[i].dni})
+                        var user = users_list[i];
+
+                        user_ul.innerHTML += ` <li id='user_${i}' class="w3-bar w3-hover-light-grey  " >
+                                                    
+                                                    <img src="${user.avatar_path}" 
+                                                         class="w3-bar-item w3-circle w3-tiny w3-margin-top " 
+                                                            style="width:55px">
+                                                        
+                                                    <div class="w3-bar-item">
+                                                        
+                                                        <span class="w3-large"> 
+                                                            ${ user.name } ${user.lastname} 
+                                                        </span>
+                                                        <span class="w3-small"> - DNI: ${user.dni}  </span>
+                                                        </br>
+                                                        <span >${user.email}</span>
+                                                    </div>
                                                 </li> `;
                     }
 
@@ -82,7 +101,14 @@
             function deselect(select_user) {
                 select_user.pop();
             }
-      
+
+            function lowerCase(elem){
+                return elem.toString().toLowerCase();
+            }
+            function isUser(user,params) {
+                return lowerCase(user).indexOf(lowerCase(params)) > -1; 
+            }
+
         </script>
     </body>
 </html>
