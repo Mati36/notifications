@@ -22,6 +22,7 @@
                   <th>Fecha de subida</th>
                   <th>Descripcion</th>
                   <th></th>
+                  <th></th>
                     <% if @current_user.is_admin %>
                         <th></th>
                     <% end %> 
@@ -49,8 +50,9 @@
                             <%else%>
                                 <td><button name="del_favorite_doc" type="submit" value="<%=document.id%>" formaction="/del_fav">Eliminar de favoritos</button> </td>
                             <%end%>   
+                            <td><button name="download_document" type="submit" value="<%=document.id%>" formaction="/download_document">Descargar</button> </td>
                             <% if @current_user.is_admin %>   
-                                <td><button name="delete_doc" type="submit" value="<%=document.id%>" formaction="/delete_doc">Eliminar</button> </td>
+                                <td><button name="delete_doc" type="submit" value="<%=document.id%>" formaction="/delete_doc">Eliminar</button> </td>   
                             <% end %>
                             
                         </form>  

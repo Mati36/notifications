@@ -21,7 +21,7 @@ class App < Sinatra::Base
 
   before do 
     #esto no va, es solo para el test 
-    # test_run(1)
+    test_run(1)
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
     
@@ -383,6 +383,20 @@ class App < Sinatra::Base
       tags_user_document(newTags, @document)
       redirect '/doc_view/'+doc_id.to_s
     end 
+  end
+
+  post '/download_document' do
+    doc_id = params["download_document"].to_i 
+    if !doc_id.nil?
+      doc = Document.find(id: doc_id)
+      if !doc.nil? 
+        name_doc = "#{doc.id}#{doc.format}"
+        send_file("#{"public"}#{doc.path}", :filename => name_doc, :type => 'Application/octet-stream')
+        redirect back
+      else
+        redirect back
+      end    
+    end  
   end
 
  # metodos 
