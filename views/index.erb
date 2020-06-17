@@ -2,10 +2,26 @@
 <html lang="es"> 
     <head>
         <meta charset = "utf-8">
-        <title>login</title>
+        <title>index</title>
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="/css/loginStyle.css">
     </head>
     <body>
        <h3> Hola <%= "#{@current_user.name} #{@current_user.lastname}"%> </h3>
+       <p>  Bienvenido/a al Sistema de Notificaciones de la Universidad Nacional de Río Cuarto.
+            Estas son las tendencias mas populares. </p>
+
+<table class="w3-table-all w3-hoverable">                
+        <%@topics.each do |topic|%>
+            <tr class="w3-hoverable"> 
+                <td>    
+                    <span class="w3-large"><td><a href ='/list_document_topic/<%=topic.topic_id%>'> <%=(Topic.find(id: topic.topic_id)).name%></a> </span> <br>                
+                </td>
+
+            </tr>
+            <%end%>           
+        </table>
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     </body>
 </html>
 

@@ -41,6 +41,7 @@ class App < Sinatra::Base
   end
 
   get "/" do
+    @topics = Document_topic.group_and_count(:topic_id).order(:count).reverse.limit(10) #Ordena por count y se queda los primeros 10
     if !request.websocket?
       erb :index
     else
