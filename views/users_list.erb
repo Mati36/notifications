@@ -4,40 +4,71 @@
         <meta charset = "utf-8">
         <title>users_list</title>
         <link rel="stylesheet" href="css/documentsStyle.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     </head>
     <body>
-        <div class="documents">
+        <div class=" w3-bar w3-table-all w3-hoverable w3-card-4">
             <table id="docs">
-                <tr>
+                <tr class="w3-blue " >
                     <th></th>
-                    <th> Nombre </th>
-                    <th> Dni </th>
-                    <th> Email </th>
-                    <th> Rol </th>
+                    <th class="w3-center"> Nombre </th>
+                    <th class="w3-center" > Email </th>
+                    <th class="w3-center" > Rol </th>
+                    <% if @current_user.is_admin%>
+                        <th> </th>
+                        <th> </th>
+                    <% end %>
                 </tr>
                 <form action="" method="POST">
                     <% @users.each do |user| %>
-                        <tr>
-                            <td><img src="<%= user.avatar_path%>" alt="avatar" style="width:20px;height:20px;"></td>   
-                            <td><a href = '/profile/<%=user.id%>' ><%="#{user.name}  #{user.lastname}"%></a></td>
-                            <td><%= user.dni %></td>
-                            <td><%= user.email %></td>
-                            <td><%= user.is_admin ? "Administrador" : "Usuario" %></td>
-                            <% if user.dni != @current_user.dni%>  
-                                <% if @current_user.is_admin && user.is_admin%>
-                                    <td><button name="delAdmin_id" type="submit" value="<%=user.id%>" formaction="/del_admin">Eliminar administrador</button> </td>
-                                <% elsif @current_user.is_admin  %>
-                                    <td><button name="addAdmin_id" type="submit" value="<%=user.id%>" formaction="/add_admin">Añadir administrador</button> </td>
+                        <tr class="">
+                            <td ><img src="<%= user.avatar_path%>" alt="avatar" class="w3-bar-item w3-circle w3-padding-16" style="width:65px"></td>   
+                            <td class="w3-margin-top " > 
+                                <div class="w3-bar-item w3-center ">
+                                    <span class="w3-large w3-margin-top">
+                                        <a href = '/profile/<%=user.id%>' > <%="#{user.name}  #{user.lastname}"%> </a>
+                                    </span><br>
+                                    <span>DNI: <%= user.dni %></span>
+                                </div>
+                             </td>
+                           <td class="w3-center w3-large " > <p class="w3-margin-top"> <%= user.email %> </p> </td>
+                            <td class="w3-center w3-large"> <p class="w3-margin-top"> <%= user.is_admin ? "Administrador" : "Usuario" %> </p> </td>
+                            <% if  @current_user.is_admin%>  
+                                <% if user.dni != @current_user.dni  && user.is_admin%>
+                                    <td class="w3-center"> 
+                                        <button class="w3-button " name="delAdmin_id" type="submit" value="<%=user.id%>" formaction="/del_admin">
+                                            <i class="w3-small" > 
+                                                    <img class="w3-hover-pale-green" src=<%=@icons+"del_admin.png"%>></br> Eliminar administrador
+                                            </i>
+                                        </button> </td>
+                                <% elsif user.dni != @current_user.dni %>
+                                    <td class="w3-center">
+                                        <button class="w3-button " name="addAdmin_id" type="submit" value="<%=user.id%>" formaction="/add_admin">
+                                            <i class="w3-small" > 
+                                                    <img class="w3-hover-pale-green" src=<%=@icons+"add_admin.png"%>></br> Añadir administrador
+                                            </i>
+                                        </button> </td>
+                                <% else %>
+                                    <td></td>
                                 <% end %>
+                                <% if user.dni != @current_user.dni %>
+                                    <td class=" w3-center w3-tiny" > 
+                                        <button class="w3-button w3-tiny" name="delete_user_id" type="submit" value="<%=user.id%>" formaction="/del_user">
+                                            <i class="w3-small" > 
+                                                <img class="w3-hover-pale-green" src=<%=@icons+"trash-2.png"%>></br> Eliminar usuario
+                                            </i>
+                                        </button>
+                                    </td>
+                                    
+                                <% else %>
+                                    <td></td>
+                                <% end %>    
                             <% end %>
                         </tr>
                     <% end %>
                 </form>
             </table>
         </div>
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+       
     </body>
 </html>

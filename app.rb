@@ -20,8 +20,8 @@ class App < Sinatra::Base
   end 
 
   before do 
-    #esto no va, es solo para el test 
-    test_run(1)
+    @icons = "/images/icons/"
+    
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
     
@@ -288,7 +288,7 @@ class App < Sinatra::Base
     elsif user_tag.length >= 8 
       @user =  find_user_dni(user_tag.to_i)
     end
-    consola("Encontro usuario",action)
+    
 
     if @user && @current_user.id != @user.id 
       if action == 'delete_admin' && @user.is_admin && User.where(is_admin: true).all.length > 1
@@ -313,7 +313,7 @@ class App < Sinatra::Base
     if user 
       user.update(is_admin: true)
     end   
-    redirect 'users_list'
+    redirect back
   end 
 
   post '/del_admin' do
@@ -322,8 +322,20 @@ class App < Sinatra::Base
     if user 
       user.update(is_admin: false)
     end 
-    redirect 'users_list'  
+    redirect back
   end 
+
+  post '/del_user' do
+    user_id = params["delete_user_id"]
+    user = find_user_id(user_id)
+    if user 
+      user.remove_all_documents
+      user.remove_all_topics
+      user.delete
+    end 
+    redirect back  
+  end 
+  
 
   get '/my_favorites' do 
     @documents = Document.join(Tag.where(user_id: @current_user.id, favorite: true),document_id: :id)
@@ -337,7 +349,13 @@ class App < Sinatra::Base
 
   post '/delete_topic' do
     topic_id = params["del_topic"]
-    Topic.where(id: topic_id).delete
+    topic = Topic.find(id: topic_id)
+    if topic
+      topic.remove_all_documents
+      topic.remove_all_users
+      topic.delete
+    end  
+    
     redirect back
   end  
 
@@ -546,25 +564,5 @@ class App < Sinatra::Base
   def get_notification_count(user_id)
     Tag.where(user_id: user_id, check_notification: false).count
   end
-  #para el test
   
-  def consola(ms,var)
-    logger.info("#{ms} #{var}")
-  end  
-  
-  def upload_users_test(session_user)
-    pwd = "1"
-    create_user("Nuevo","Administrador",40277610,"admin@gmail.com",pwd).save
-    create_user("Matias","Lopez",40277612,"mati@gmail.com",pwd).save
-    create_user("Facundo","Fernandez",40277613,"facu@gmail.com",pwd).save
-    create_user("Nahuel","Filippa",40277614,"nahuel@gmail.com",pwd).save
-  end  
-
-  def test_run(id)
-      if (User.all.length <= 0)
-        upload_users_test(session[:current_user])
-      end  
-      session[:user_id] = User[id].id
-  end 
-
 end
