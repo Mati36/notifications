@@ -88,7 +88,7 @@ class App < Sinatra::Base
   end
 
   get '/save_document' do 
-    @topics = Topic.all 
+    @topics = Topic.map{|x| x.to_hash}.to_json
     @users  = User.exclude(id: @current_user.id).map{|x| x.to_hash}.to_json
     erb :save_document
   end
@@ -112,7 +112,7 @@ class App < Sinatra::Base
         document.update(path: "/files/#{@id}#{@fileFormat}")
 
         tags_user_document(params["tag"],document)
-        document_add_topic(document, params["topics"])
+        document_add_topic(document, params["select_topic"])
         user_add_notification(document)
         
         cp(file.path, @localPath)
@@ -425,8 +425,7 @@ class App < Sinatra::Base
     User.exclude(id: @current_user.id).each do |user|
       if !user.nil? && !Tag.find(user_id: user.id, document_id: document.id)
         document.topics.each do |topic|
-          #Revisar con mas de un tag (Si se repiten relaciones)!!
-          if Subscription.find(user_id: user.id, topic_id: topic.id)
+          if !find_document_user(user.id, document.id) && Subscription.find(user_id: user.id, topic_id: topic.id)
             user.add_document(document)
             ws_msj(get_notification_count(user.id)) 
           end
@@ -497,11 +496,19 @@ class App < Sinatra::Base
     @current_user.add_topic(topic)
   end 
 
-  def document_add_topic(document,topic_id)
-    topic = Topic.find(id: topic_id)
-    if(topic)
-      document.add_topic(topic)
+  def document_add_topic(document,topics_document)
+  
+    topics = topics_document.split('#').reject { |topic| topic.empty? }
+    topics.each do |topic_name|
+     
+      if !topic_name.empty?
+        topic = Topic.find(name: topic_name);
+        if !Document_topic.find(document_id: document.id,topic_id: topic.id)
+          document.add_topic(topic)
+        end
+      end  
     end
+
   end 
   
   def create_user(name,lastname,dni,email,password)
@@ -521,7 +528,7 @@ class App < Sinatra::Base
     end
   end  
 
-  def notification_count() 
+  def notification_count 
     
     get_notification.each do |notif|
       if !notif.check_notification

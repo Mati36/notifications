@@ -19,84 +19,29 @@
                 <div class="filter w3-round-large ">
                     <ul id="filter_users" class="w3-ul w3-card w3-border w3-round-large " > </ul>
                 </div>
+                
                 <label for="type" >Tipo</label> 
                 <select id="type" name="type"> 
                     <option value="Act">Acta</option>
                     <option value="Resolution">Resolucion</option>
                 </select> <br>
+                
                 <label for="select_topic" >Tendencia</label> 
-                <select id="select_topic" name="topics"> 
-                    <%@topics.each do |topic|%>
-                        <option value="<%=topic.id%>"><%=topic.name%></option>
-                    <%end%>
+                <input type="text" name="select_topic" id="topic">
+                
+                <div class="filter w3-round-large ">
+                    <ul id="filter_topics" class="w3-ul w3-card w3-border w3-round-large " > </ul>
+                </div>
+                
                 </select> <br>
                 <input name="fileInput" type="file" accept= ".pdf, .jpg, .jpeg, .png"  /> <br>
                 <input type="submit" value="Subir Documento"> 
             </form>
         </div>
         <script> 
-            users = <%= @users%>;
-             
-            var search = document.getElementById('tag');
-            var user_ul = document.getElementById('filter_users');
-            var select_user=[];
-
-            search.innerHTML = '';
-            search.addEventListener('keyup',e => {
-                var lastChar = select_user.join('').length;    
-                var text = search.value.substr(lastChar);
-               
-                if (search.value.length < lastChar)
-                   deselect(select_user);
-                
-                user_ul.innerHTML = '';
-                if (text != ''){
-                    
-                    var users_list = users.filter( function (user) {
-                        input_text = lowerCase(text);
-                        fullName = (user.name+' '+user.lastname).toLowerCase();
-                        email = lowerCase(user.email);
-                        return (isUser(user.dni,input_text) || isUser(user.name,input_text) 
-                                    || isUser(user.lastname,input_text) || isUser(fullName,input_text) 
-                                    || isUser(user.email,input_text)
-                                );
-                                
-                    });
-
-                    for (let i = 0; i < users_list.length; i++) {
-                        var user = users_list[i];
-
-                        user_ul.innerHTML += ` <li id='user_${i}' class="w3-bar w3-hover-light-grey  " >
-                                                    
-                                                    <img src="${user.avatar_path}" 
-                                                         class="w3-bar-item w3-circle w3-tiny w3-margin-top " 
-                                                            style="width:55px">
-                                                        
-                                                    <div class="w3-bar-item">
-                                                        
-                                                        <span class="w3-large"> 
-                                                            ${ user.name } ${user.lastname} 
-                                                        </span>
-                                                        <span class="w3-small"> - DNI: ${user.dni}  </span>
-                                                        </br>
-                                                        <span >${user.email}</span>
-                                                    </div>
-                                                </li> `;
-                    }
-
-                    for (let i = 0; i < users_list.length; i++) {
-                        document.getElementById('user_'+i).addEventListener('click', e=> {
-                            select_user.push('@' + users_list[i].dni.toString());
-                            search.value ='';
-                            for (let i = 0; i < select_user.length; i++) {
-                                search.value += select_user[i];    
-                            }
-                            user_ul.innerHTML = '';
-                        }); 
-                    }
-                }
-                
-            });
+            
+            usersFilter(<%= @users%>); 
+            topicsFilter(<%= @topics %>);
             
             function deselect(select_user) {
                 select_user.pop();
@@ -105,9 +50,134 @@
             function lowerCase(elem){
                 return elem.toString().toLowerCase();
             }
-            function isUser(user,params) {
+            function match(user,params) {
                 return lowerCase(user).indexOf(lowerCase(params)) > -1; 
             }
+            function arrayString(array){
+                return array.join('');
+            }    
+
+            function usersFilter(array) {
+                users = array;
+                var search = document.getElementById('tag');
+                var user_ul = document.getElementById('filter_users');
+                var select_user=[];
+
+                search.innerHTML = '';
+                search.addEventListener('keyup',e => {
+                    var lastChar = select_user.join('').length;    
+                    var text = search.value.substr(lastChar);
+                
+                    if (search.value.length < lastChar){
+                    deselect(select_user);
+                            search.value = arrayString(select_user);
+                    }
+                    
+                    
+                    user_ul.innerHTML = '';
+                    if (text != ''){
+                        
+                        var users_list = users.filter( function (user) {
+                            input_text = lowerCase(text);
+                            fullName = (user.name+' '+user.lastname).toLowerCase();
+                            email = lowerCase(user.email);
+                            return (match(user.dni,input_text) || match(user.name,input_text) 
+                                        || match(user.lastname,input_text) || match(fullName,input_text) 
+                                        || match(user.email,input_text)
+                                    );
+                                    
+                        });
+                        
+                        ulUser(users_list,user_ul);    
+                        
+                        for (let i = 0; i < users_list.length; i++) {
+                            document.getElementById('user_'+i).addEventListener('click', e=> {
+                                select_user.push('@' + users_list[i].dni.toString());
+                                search.value ='';
+                                search.value = arrayString(select_user);
+                                user_ul.innerHTML = '';
+                            }); 
+                        }
+                    }
+                
+                });
+            }
+        function topicsFilter(array) {
+            
+            topics = array;
+            var search_topics = document.getElementById('topic');
+            var topic_ul = document.getElementById('filter_topics');
+            var select_topics=[];
+            search_topics.innerHTML = '';
+          
+            search_topics.addEventListener('keyup',e => {
+                var lastChar = select_topics.join('').length;    
+                var text = search_topics.value.substr(lastChar);
+            
+                if (search_topics.value.length < lastChar){
+                    deselect(select_topics);
+                    search_topics.value = arrayString(select_topics);
+                }
+                
+                
+                topic_ul.innerHTML = '';
+                if (text != ''){
+                    
+                    var topics_list = topics.filter( function (topic) {
+                        input_text = lowerCase(text);
+                        return (match(topic.name,input_text) );
+                                
+                    });
+
+                    ulTopics(topics_list,topic_ul);
+
+                    for (let i = 0; i < topics_list.length; i++) {
+                        document.getElementById('topic_'+i).addEventListener('click', e=> {
+                            select_topics.push('#' + topics_list[i].name.toString());
+                            search_topics.value ='';
+                            search_topics.value = arrayString(select_topics);
+                            topic_ul.innerHTML = '';
+                        }); 
+                    }
+                }
+            
+            });
+        }
+        function ulTopics(topics_list,ul) {
+            for (let i = 0; i < topics_list.length; i++) {
+                var topic = topics_list[i];
+                ul.innerHTML += ` <li id='topic_${i}' class="w3-bar w3-hover-light-grey  " >
+                                        <div class="w3-bar-item ">
+                                            <span class="w3-large"> 
+                                                ${ topic.name } 
+                                            </span>
+                                        </div>
+                                    </li> `;
+            }
+        }  
+        
+        function ulUser(users_list,ul) {
+            for (let i = 0; i < users_list.length; i++) {
+                var user = users_list[i];
+
+                ul.innerHTML += ` <li id='user_${i}' class="w3-bar w3-hover-light-grey  " >
+                                            
+                                            <img src="${user.avatar_path}" 
+                                                class="w3-bar-item w3-circle w3-tiny w3-margin-top " 
+                                                    style="width:55px">
+                                                
+                                            <div class="w3-bar-item">
+                                                
+                                                <span class="w3-large"> 
+                                                    ${ user.name } ${user.lastname} 
+                                                </span>
+                                                <span class="w3-small"> - DNI: ${user.dni}  </span>
+                                                </br>
+                                                <span >${user.email}</span>
+                                            </div>
+                                        </li> `;
+            }
+        }
 
         </script>
     </body>
