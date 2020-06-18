@@ -20,11 +20,14 @@ class App < Sinatra::Base
   end 
 
   before do 
+
+    test_run(4)
+    
     @icons = "/images/icons/"
     
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
-    
+    delete_old_notifications
     if !@current_user && @path != '/login' && @path != '/signUp'
       redirect '/login'
     elsif @current_user
@@ -475,9 +478,6 @@ class App < Sinatra::Base
     doc = find_document_user(@current_user.id, document.id)
     if !doc.nil?
       doc.update(favorite: false,check_notification: true)
-      if !doc.tag && !doc.checked && doc.check_notification
-        @current_user.remove_document(document)
-      end 
     end 
   end 
 
@@ -545,24 +545,51 @@ class App < Sinatra::Base
     notifications.each do |notification|
       notification.update(check_notification: true)
     end
-  end  
-
-  def notification_count 
-    
-    get_notification.each do |notif|
-      if !notif.check_notification
-          @newNotif = @newNotif + 1
-      end
-    end
-    return @newNotif
-  end  
+  end   
 
   def get_notification
-    Tag.where(user_id: @current_user.id).order(:created_at).reverse
+    get_documents_user.reverse
   end  
 
+  def get_documents_user
+    Tag.where(user_id: @current_user.id).order(:created_at)
+  end   
+  
   def get_notification_count(user_id)
     Tag.where(user_id: user_id, check_notification: false).count
   end
+
+  def delete_old_notifications
+    notif = get_documents_user
+    limit = 1
+      if notif.count > limit
+        get_documents_user.limit(limit).offset(0).each do |n|
+          @current_user.remove_document(Document.find(id: n.document_id))
+          
+        end  
+      end  
+  end
+
+  #@current_user.remove_topic(topic)
+
+  def consola(ms,var)
+    logger.info("#{ms} #{var}")
+  end  
+  
+  def upload_users_test(session_user)
+    pwd = "1"
+    create_user("Nuevo","Administrador",40277610,"admin@gmail.com",pwd).save
+    create_user("Matias","Lopez",40277612,"mati@gmail.com",pwd).save
+    create_user("Facundo","Fernandez",40277613,"facu@gmail.com",pwd).save
+    create_user("Nahuel","Filippa",40277614,"nahuel@gmail.com",pwd).save
+  end  
+
+  def test_run(id)
+      if (User.all.length <= 0)
+        upload_users_test(session[:current_user])
+      end  
+      session[:user_id] = User[id].id
+  end 
+
   
 end
