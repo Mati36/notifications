@@ -24,21 +24,23 @@
                     <%end%> 
                
                     <%if notif.tag %>  
-                    <td>    
-                        <div class="notifSelection "><a href = '/doc_view/<%=notif.document_id%> ' target="_blank" > 
-                            Se le nombro en el documento: <%= @doc.title%>  <br>
-                            <%= @doc.description%>
-                        </a> </div>
-                    <%elsif  topic%> 
-                    <td> 
-                        <%if Subscription.find(user_id:@current_user.id, topic_id:topic.id) %>
-                            <div class="notifSelection"><a href = '/doc_view/<%=notif.document_id%>' target="_blank" > 
-                                Nueva publicacion en la tendencia: <%= topic.name %>. Documento: <%= @doc.title%> <br>
+                        <td>    
+                            <div class="notifSelection "><a href = '/doc_view/<%=notif.document_id%> ' target="_blank" > 
+                                Se le nombro en el documento: <%= @doc.title%>  <br>
                                 <%= @doc.description%>
-                            </a> </div> 
+                            </a> </div>
+                        </td>
+                    <%elsif  topic %> 
+                      <%if Subscription.find(user_id:@current_user.id, topic_id:topic.id) %>
+                            <td> 
+                                <div class="notifSelection"><a href = '/doc_view/<%=notif.document_id%>' target="_blank" > 
+                                    Nueva publicacion en la tendencia: <%= topic.name %>. Documento: <%= @doc.title%> <br>
+                                    <%= @doc.description%>
+                                </a> </div> 
+                            </td>
                         <%end %>
                     <%end %>
-                    </td>   
+                       
             </tr>
             <%end%>  
             

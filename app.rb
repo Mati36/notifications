@@ -21,13 +21,11 @@ class App < Sinatra::Base
 
   before do 
 
-    test_run(4)
-    
     @icons = "/images/icons/"
     
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
-    delete_old_notifications
+    
     if !@current_user && @path != '/login' && @path != '/signUp'
       redirect '/login'
     elsif @current_user
@@ -44,6 +42,7 @@ class App < Sinatra::Base
   end
 
   get "/" do
+    delete_old_notifications
     @topics = Document_topic.group_and_count(:topic_id).order(:count).reverse.limit(10) #Ordena por count y se queda los primeros 10
     if !request.websocket?
       erb :index
@@ -292,7 +291,6 @@ class App < Sinatra::Base
       @user =  find_user_dni(user_tag.to_i)
     end
     
-
     if @user && @current_user.id != @user.id 
       if action == 'delete_admin' && @user.is_admin && User.where(is_admin: true).all.length > 1
         @user.update(is_admin: false, updated_at: date_time)
@@ -427,12 +425,12 @@ class App < Sinatra::Base
    return DateTime.now.strftime("%m/%d/%Y: %T")
   end  
 
-  # este metodo taggea a los usuarios con el documento
   def tags_user_document(tags_user, document) 
     users = get_tags(tags_user)
+    
     users.each do |user_dni|
-     
-      if !user_dni.empty?
+      
+     if !user_dni.empty? && !@current_user.dni.to_s.eql?(user_dni)
         user = find_user_dni(user_dni)
         if !Tag.find(user_id: user.id, document_id: document.id)
           user.add_document(document)
@@ -560,36 +558,15 @@ class App < Sinatra::Base
   end
 
   def delete_old_notifications
-    notif = get_documents_user
-    limit = 1
-      if notif.count > limit
-        get_documents_user.limit(limit).offset(0).each do |n|
-          @current_user.remove_document(Document.find(id: n.document_id))
-          
+    notification = get_documents_user
+    limit_notification = 50
+      if notification.count > limit_notification
+        get_documents_user.limit(notification.count - limit_notification).offset(limit_notification).each do |n|
+          if n.check_notification && !n.tag && !n.favorite
+            @current_user.remove_document(Document.find(id: n.document_id))
+          end 
         end  
       end  
   end
-
-  #@current_user.remove_topic(topic)
-
-  def consola(ms,var)
-    logger.info("#{ms} #{var}")
-  end  
-  
-  def upload_users_test(session_user)
-    pwd = "1"
-    create_user("Nuevo","Administrador",40277610,"admin@gmail.com",pwd).save
-    create_user("Matias","Lopez",40277612,"mati@gmail.com",pwd).save
-    create_user("Facundo","Fernandez",40277613,"facu@gmail.com",pwd).save
-    create_user("Nahuel","Filippa",40277614,"nahuel@gmail.com",pwd).save
-  end  
-
-  def test_run(id)
-      if (User.all.length <= 0)
-        upload_users_test(session[:current_user])
-      end  
-      session[:user_id] = User[id].id
-  end 
-
-  
+ 
 end
