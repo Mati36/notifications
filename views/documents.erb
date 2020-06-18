@@ -46,13 +46,14 @@
                             <td><%=document.description%></td>
 
                             <% if !find_document_favorite(@current_user.id,document.id) && request.path_info != '/my_favorites' %> 
-                                <td><button name="add_favorite_doc" type="submit" value="<%=document.id%>" formaction="/add_fav">Agregar a favoritos</button> </td>
+                                <td><button class="w3-button" name="add_favorite_doc" type="submit" value="<%=document.id%>" formaction="/add_fav"><i><img src="/images/icons/disabled-star.png"></i></button> </td>
                             <%else%>
-                                <td><button name="del_favorite_doc" type="submit" value="<%=document.id%>" formaction="/del_fav">Eliminar de favoritos</button> </td>
+                                <td><button class="w3-button" name="del_favorite_doc" type="submit" value="<%=document.id%>" formaction="/del_fav"><i><img src="/images/icons/enabled-star.png"></i></button> </td>
                             <%end%>   
-                            <td><button name="download_document" type="submit" value="<%=document.id%>" formaction="/download_document">Descargar</button> </td>
+                            <td><button class="w3-button" name="download_document" type="submit" value="<%=document.id%>" formaction="/download_document"><i><img src="/images/icons/download.png"></i></button> </td>
                             <% if @current_user.is_admin %>   
-                                <td><button name="delete_doc" type="submit" value="<%=document.id%>" formaction="/delete_doc">Eliminar</button> </td>   
+                                
+                                <td><button class="w3-button" name="delete_doc" type="submit" value="<%=document.id%>" formaction="/delete_doc"><i><img src="/images/icons/trash-2.png"></i></button> </td>   
                             <% end %>
                             
                         </form>  

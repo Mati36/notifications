@@ -3,21 +3,28 @@
     <head>
         <meta charset = "utf-8">
         <title>edit_profile</title>
+        <link rel="stylesheet" href="css/loginStyle.css">
+
     </head>
     <body>
         <div>
             <form action="/edit_profile" method="POST" enctype="multipart/form-data">
-                Editar Perfil <br>
-                <img src="<%=@current_user.avatar_path%>" class="picture" style="width:180px;height:180px;"> <br>   
-                <input name="fileInput" type="file" accept= ".jpg, .jpeg, .png"  /> <br> 
-                <label for="name">nombre</label>
-                <input type="text" name="name" value= <%=@current_user.name%>  / data-validation="alphanumeric" > <br>
-                <label for="lastname">Apellido</label> 
-                <input type="text" name="lastname" value= <%=@current_user.lastname%> / data-validation="alphanumeric" > <br>
-                <label for="email">Email</label> 
-                <input type="text" name="email" value= <%=@current_user.email%> / data-validation="email" > <br>   
-                <button name="change_pass" type="submit" formaction="/change_password" formmethod="GET">Cambiar contraseña</button> 
-                <input type="submit" value="Aceptar">  
+                <h1>Editar Perfil</h1>
+                <div class="w3-container w3-cell">
+                    <img src="<%=@current_user.avatar_path%>" class="picture" style="width:180px;height:180px;"> <br>  
+                    <input name="fileInput" type="file" accept= ".jpg, .jpeg, .png"  /> <br> <br> <br>
+                    <button name="change_pass" type="submit" formaction="/change_password" formmethod="GET">Cambiar contraseña</button> 
+                </div>
+                <div class="w3-container w3-cell">
+                    <label for="name">Nombre</label>
+                    <input type="text" name="name" value= <%=@current_user.name%>  / data-validation="alphanumeric" >
+                    <label for="lastname">Apellido</label> 
+                    <input type="text" name="lastname" value= <%=@current_user.lastname%> / data-validation="alphanumeric" >
+                    <label for="email">Email</label> 
+                    <input type="text" name="email" value= <%=@current_user.email%> / data-validation="email" >  
+                   
+                    <input type="submit" value="Aceptar">  
+                </div>
             </form>   
         </div>
     </body>

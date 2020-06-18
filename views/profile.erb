@@ -5,27 +5,25 @@
         <title>profile</title>
         <link rel="stylesheet" href="css/profileStyle.css">
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
     </head>
     <body>
-       
-       <img src="<%=@user.avatar_path%>" class="picture w3-circle" style="width:180px;height:180px;"> <br>   
-       
-       <div class="w3-col m4 l3">
+        <div class="w3-container w3-cell">
+            <img src="<%=@user.avatar_path%>" class="picture w3-circle" style="width:180px;height:180px;"> <br>   
+        </div>
+        <div class="w3-container w3-cell">
             <h1> <%=@user.name%> <%=@user.lastname%> </h1>
             <h2>DNI: <%=@user.dni%> </h2>
-            <h2>Correo Electronico: <%=@user.email%> </h2> <br> <br>
+            <h2>Correo Electronico: <%=@user.email%> </h2>
+            <%if @user.id == @current_user.id%>
+            <div class="buttonSpace">
+                <form action="/edit_profile" method="GET">
+                    <button type="submit" ><img src="/images/icons/edit.png"></button>  
+                </form>   
+            </div>
+        <%end%>
         </div>
-        
-        <div class="buttonSpace">
-            <form action="/edit_profile" method="GET">
-                <input type="submit" value="Editar Perfil">  
-            </form>   
-        </div>
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
-
+       
+       
     </body>
 
 </html>

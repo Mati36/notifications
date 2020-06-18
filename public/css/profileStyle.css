@@ -30,8 +30,11 @@ input[type=submit] {
   border-radius: 4px;
 }
 
+.imgSpace{
+  width: 25%;
+}
+
 .info{
-    position: fixed;
     position: fixed;
     top: 50%;
     left: 20%;
@@ -40,7 +43,14 @@ input[type=submit] {
 
 .buttonSpace{
     position: fixed;
-    top: 30%;
+    top: 5%;
     right: 10%;
     width: 30%;
+}
+
+.data{
+  max-width: 65%;
+  position: fixed;
+  left: 30%;
+
 }
