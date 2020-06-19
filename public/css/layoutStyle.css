@@ -20,6 +20,14 @@
   max-height: 100%;
 }
 
+.loginInfo{
+  position: fixed;
+  top: 0%;
+  right: 10%;
+  text-decoration-color: red;
+  background-color: lightblue;
+}
+
 .logoutButton{
   position: fixed;
   top: 15%;

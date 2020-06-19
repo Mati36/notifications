@@ -3,23 +3,26 @@
     <head>
         <meta charset = "utf-8">
         <title>topic:list</title>
-        <link rel="stylesheet" href="/css/loginStyle.css">
+        <link rel="stylesheet" href="/css/documentStyle.css">
     </head>
     <body>
         <%= erb :search_input%>
-        <table class="w3-table-all w3-hoverable" id="list">
-                   
+        <table class="w3-bar w3-table-all w3-hoverable w3-card-4" id="list">
+            <tr class="w3-blue" >
+                <th>Tendencias</th>
+                <th></th>
+            </tr>
             <%@topics.each do |topic|%>
             <tr class="w3-hoverable"> 
                 <td>    
-                   <span class="w3-large"><td><a href ='/list_document_topic/<%=topic.id%>' ><%=topic.name%></a></span><br>                
+                   <span class="w3-large"><a href ='/list_document_topic/<%=topic.id%>'><%=topic.name%></a></span>              
                 </td>
 
                 <form action="" method="POST">
                   
                     <%if !Subscription.find(user_id: @current_user.id, topic_id: topic.id) %> 
                         <td>          
-                            <button class="w3-button w3-blue w3-round-xxlarge w3-center" name="sub_topic" type="submit" value="<%=topic.id%>" 
+                            <button class="w3-button w3-blue w3-round-xxlarge" name="sub_topic" type="submit" value="<%=topic.id%>" 
                                 formaction="/subscription_topic"> Suscribirse </button>      
                         </td> 
                     <%else%>  

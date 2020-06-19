@@ -7,9 +7,13 @@
     <body>
     
     <div class="w3-container w3-padding-16">
-        <i><img src="<%=@icons+"search.png"%>"></i>
-        <input class="w3-input w3-border w3-padding w3-medium" style="width:30%" type="text" 
-            placeholder="Nombre del documento.." id="myInput" onkeyup="myFunction()" >  
+        <div class="w3-cell w3-border">
+            <i><img src="<%=@icons+"search.png"%>"></i>
+        </div>
+        <div class="w3-cell">
+            <input class="w3-input w3-border w3-padding w3-medium" style="width:100%" type="text" 
+            placeholder="Buscar..." id="myInput" onkeyup="myFunction()" >  
+        </div>
     </div>
     </body>
 </html>

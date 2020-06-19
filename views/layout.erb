@@ -6,8 +6,8 @@
         <title>Sistema de Notificaciones UNRC</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
         <link rel="stylesheet" href="/css/layoutStyle.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
     <body>   
        
@@ -21,29 +21,32 @@
             </div>
             <%= erb :socket%>
       </div>
-            <div class="logoutButton"><a href = '/log_out'> Cerrar Sesion </a> </div>
+            <%if @current_user%>
+                <div class="loginInfo"> Sesion iniciada como <%=@current_user.name%> <%=@current_user.lastname%> </div>
+                <div class="logoutButton"><a href = '/log_out'> Cerrar Sesion </a> </div>
+            <%end%>
         </div> 
         <div class="row">
                 <div class="menuPanel">
                 <%if(@current_user)%>
                     <div class = "offset"></div>
-                    <div class="menu">
-                        <div class="menuButton"><a href = '/documents'> Todos los Documentos </a> </div> 
-                        <div class="menuButton"><a href = '/my_favorites'> Documentos Favoritos </a> </div>
-                        <div class="menuButton"><a href = '/my_tags'> Documentos Etiquetado </a> </div> 
-                        <div class="menuButton"><a href = '/profile/<%=@current_user.id%>'> Mi Perfil </a> </div>
-                        <div class="menuButton"><a href = '/users_list'> Usuarios </a> </div>
-                        <div class="menuButton"><a href = '/topic_list'> Lista de tendencias </a> </div>
+                    <div class="w3-sidebar w3-bar-block w3-blue w3-card" style="width: 18%;">
+                        <a href = '/documents' class='w3-bar-item w3-button w3-border-bottom'> Todos los Documentos </a> 
+                        <a href = '/my_favorites' class='w3-bar-item w3-button w3-border-bottom'> Documentos Favoritos </a> 
+                        <a href = '/my_tags' class='w3-bar-item w3-button w3-border-bottom'> Documentos Etiquetado </a> 
+                        <a href = '/profile/<%=@current_user.id%>' class='w3-bar-item w3-button w3-border-bottom'> Mi Perfil </a> 
+                        <a href = '/users_list' class='w3-bar-item w3-button w3-border-bottom'> Usuarios </a> 
+                        <a href = '/topic_list' class='w3-bar-item w3-button w3-border-bottom'> Lista de tendencias </a> 
                         <%if(@current_user.is_admin)%>
-                            <div class="menuContainer">
-                                <div class="dropTrigger"> <p class= adm>Opc. Administrador</p> </div>
-                                <div class="dropdown">
-                                    <div class="menuButton"><a href = '/save_document'> Subir Documento </a> </div> 
-                                    <div class="menuButton"><a href = '/my_upload_documents'> Mis Documentos Subidos </a> </div> 
-                                    <div class="menuButton"><a href = '/change_role/add_admin'> Nuevo Administrador </a> </div> 
-                                    <div class="menuButton"><a href = '/change_role/delete_admin'> Borrar Administrador </a> </div>
-                                    <div class="menuButton"><a href = '/add_topic'> Crear Tendencia </a> </div>
-                                </div>
+                            <button class="w3-button w3-block w3-left-align w3-border-bottom" onclick="myAccFunc()">
+                            Opciones de Administrador <i class="fa fa-caret-down"></i>
+                            </button>
+                            <div id="demoAcc" class="w3-hide w3-light-blue w3-card">
+                                <a href = '/save_document' class='w3-bar-item w3-button w3-border-bottom'> Subir Documento </a> 
+                                <a href = '/my_upload_documents' class='w3-bar-item w3-button w3-border-bottom'> Mis Documentos Subidos </a>
+                                <a href = '/change_role/add_admin' class='w3-bar-item w3-button w3-border-bottom'> Nuevo Administrador </a>
+                                <a href = '/change_role/delete_admin' class='w3-bar-item w3-button w3-border-bottom'> Borrar Administrador </a>
+                                <a href = '/add_topic' class='w3-bar-item w3-button w3-border-bottom'> Crear Tendencia </a> 
                             </div>
                         <%end%>
                     </div>
@@ -55,20 +58,30 @@
         <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
-        <%# <script>
-            function w3_open() {
-                
-                var notification = document.getElementById("notifList").style.display
-                
-               var x = document.getElementById("notifList");
-                if (x.style.display === "none") {
-                  
-                    x.style.display = "block";
-                } else {
-                    x.style.display = "none";
-                }
+        <script>
+            function myAccFunc() {
+              var x = document.getElementById("demoAcc");
+              if (x.className.indexOf("w3-show") == -1) {
+                x.className += " w3-show";
+                x.previousElementSibling.className += " w3-light-blue";
+              } else { 
+                x.className = x.className.replace(" w3-show", "");
+                x.previousElementSibling.className = 
+                x.previousElementSibling.className.replace(" w3-light-blue", "");
+              }
             }
-       
-        </script> %>
+
+            function myDropFunc() {
+              var x = document.getElementById("demoDrop");
+              if (x.className.indexOf("w3-show") == -1) {
+                x.className += " w3-show";
+                x.previousElementSibling.className += " w3-light-blue";
+              } else { 
+                x.className = x.className.replace(" w3-show", "");
+                x.previousElementSibling.className = 
+                x.previousElementSibling.className.replace(" w3-light-blue", "");
+              }
+            }
+        </script>
     </body>
 </html>
