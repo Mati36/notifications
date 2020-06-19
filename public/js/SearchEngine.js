@@ -9,7 +9,7 @@ function myFunction() {
         
         if ( pathname === '/topic_list' || pathname === '/users_list' )
             td = tr[i].getElementsByTagName("td")[1];
-        else if (pathname === '/documents')
+        else if (pathname === '/documents' || pathname === '/my_tags' || pathname === '/my_favorites')
             td = tr[i].getElementsByTagName("td")[0];
         
         if (td) {
