@@ -3,11 +3,11 @@
     <head>
         <meta charset = "utf-8">
         <title>topic:list</title>
-        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
         <link rel="stylesheet" href="/css/loginStyle.css">
     </head>
     <body>
-        <table class="w3-table-all w3-hoverable">
+        <%= erb :search_input%>
+        <table class="w3-table-all w3-hoverable" id="list">
                    
             <%@topics.each do |topic|%>
             <tr class="w3-hoverable"> 
@@ -39,23 +39,7 @@
                 </form>     
             </tr>
             <%end%>  
-            
-                           
-                  
-        </table>
-        
-        <div class="w3-container">
-            <ul class="w3-card-4 w3-ul">
-                
-                    <div class="w3-hover-blue">
-                        
-                        
-                    </li>
-
-              
-            </ul>  
-        </div>
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        </table>    
     </body>
 </html>
 

@@ -4,67 +4,55 @@
         <meta charset = "utf-8">
         <title>document</title>
         <link rel="stylesheet" href="css/documentsStyle.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
     </head>
     <body>
-            <form action="" method="POST">
-                <label for="type">Tipo</label>
-                <select id="type" name="type">
-                    <option value="All">Todas</option> 
-                    <option value="Act">Acta</option>
-                    <option value="Resolution">Resolucion</option>
-                </select> 
-                <button name="filter_type" type="submit" formaction="/choose_type">Filtrar</button>
-            </form>    
-           <table class="w3-table-all w3-hoverable w3-card-4">
-                <tr class="w3-blue" >
-                  <th>Titulo</th>
-                  <th>Fecha de subida</th>
-                  <th>Descripcion</th>
-                  <th></th>
-                  <th></th>
-                    <% if @current_user.is_admin %>
-                        <th></th>
-                    <% end %> 
-                </tr>
-                <%@documents.each do |document| 
-                    doc = find_document_user(@current_user.id, document.id)
-                    #hacer mas optimas estas validaciones 
-                    if doc 
-                        if doc.checked %>
-                            <tr id="row" class="w3-hover-cyan w3-grey">    
-                        <%else%>
-                            <tr id="row" class="w3-hover-light-blue w3-light-grey">      
-                        <%end%>
-                    <%else%>
-                        <tr id="row" class="w3-hover-light-blue w3-light-grey">  
-                    <%end%>  
-                    <% if document.visibility %>   
-                        <form action="" method="POST">
-                            <td><a href = '/doc_view/<%= document.id%>' target="_blank" > <%= document.title%></a></td>
-                            <td><%=document.created_at.to_date%></td>
-                            <td><%=document.description%></td>
-
-                            <% if !find_document_favorite(@current_user.id,document.id) && request.path_info != '/my_favorites' %> 
-                                <td><button class="w3-button" name="add_favorite_doc" type="submit" value="<%=document.id%>" formaction="/add_fav"><i><img src="/images/icons/disabled-star.png"></i></button> </td>
-                            <%else%>
-                                <td><button class="w3-button" name="del_favorite_doc" type="submit" value="<%=document.id%>" formaction="/del_fav"><i><img src="/images/icons/enabled-star.png"></i></button> </td>
-                            <%end%>   
-                            <td><button class="w3-button" name="download_document" type="submit" value="<%=document.id%>" formaction="/download_document"><i><img src="/images/icons/download.png"></i></button> </td>
-                            <% if @current_user.is_admin %>   
-                                
-                                <td><button class="w3-button" name="delete_doc" type="submit" value="<%=document.id%>" formaction="/delete_doc"><i><img src="/images/icons/trash-2.png"></i></button> </td>   
-                            <% end %>
-                            
-                        </form>  
-                    <% end %>  
-                    </tr>       
-                <%end%>
-            </table>
         
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+        <%= erb :search_input%>
+        <table class="w3-table-all w3-hoverable w3-card-4" id="list">
+            <tr class="w3-blue" >
+                <th>Titulo</th>
+                <th>Fecha de subida</th>
+                <th>Descripcion</th>
+                <th></th>
+                <th></th>
+                <% if @current_user.is_admin %>
+                    <th></th>
+                <% end %> 
+            </tr>
+            <%@documents.each do |document| 
+                doc = find_document_user(@current_user.id, document.id)
+                #hacer mas optimas estas validaciones 
+                if doc 
+                    if doc.checked %>
+                        <tr id="row" class="w3-hover-cyan w3-grey">    
+                    <%else%>
+                        <tr id="row" class="w3-hover-light-blue w3-light-grey">      
+                    <%end%>
+                <%else%>
+                    <tr id="row" class="w3-hover-light-blue w3-light-grey">  
+                <%end%>  
+                <% if document.visibility %>   
+                    <form action="" method="POST">
+                        <td><a href = '/doc_view/<%= document.id%>' target="_blank" > <%= document.title%></a></td>
+                        <td><%=document.created_at.to_date%></td>
+                        <td><%=document.description%></td>
+
+                        <% if !find_document_favorite(@current_user.id,document.id) && request.path_info != '/my_favorites' %> 
+                            <td><button class="w3-button" name="add_favorite_doc" type="submit" value="<%=document.id%>" formaction="/add_fav"><i><img src=" <%=@icons+"disabled-star.png"%>"></i></button> </td>
+                        <%else%>
+                            <td><button class="w3-button" name="del_favorite_doc" type="submit" value="<%=document.id%>" formaction="/del_fav"><i><img src="<%=@icons+"enabled-star.png"%>"></i></button> </td>
+                        <%end%>   
+                        <td><button class="w3-button" name="download_document" type="submit" value="<%=document.id%>" formaction="/download_document"><i><img src="<%=@icons+"download.png"%>"></i></button> </td>
+                        <% if @current_user.is_admin %>   
+                            
+                            <td><button class="w3-button" name="delete_doc" type="submit" value="<%=document.id%>" formaction="/delete_doc"><i><img src="<%=@icons+"trash-2.png"%>"></i></button> </td>   
+                        <% end %>
+                        
+                    </form>  
+                <% end %>  
+                </tr>       
+            <%end%>
+        </table>
     </body>
 </html>
 

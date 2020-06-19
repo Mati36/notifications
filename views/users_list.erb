@@ -4,11 +4,11 @@
         <meta charset = "utf-8">
         <title>users_list</title>
         <link rel="stylesheet" href="css/documentsStyle.css">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     </head>
     <body>
-        <div class=" w3-bar w3-table-all w3-hoverable w3-card-4">
-            <table id="docs">
+        <%= erb :search_input%>
+        <div >
+            <table class=" w3-bar w3-table-all w3-hoverable w3-card-4" id="list">
                 <tr class="w3-blue " >
                     <th></th>
                     <th class="w3-center"> Nombre </th>
@@ -26,7 +26,7 @@
                             <td class="w3-margin-top " > 
                                 <div class="w3-bar-item w3-center ">
                                     <span class="w3-large w3-margin-top">
-                                        <a href = '/profile/<%=user.id%>' > <%="#{user.name}  #{user.lastname}"%> </a>
+                                        <a  href = '/profile/<%=user.id%>' ><%="#{user.name}  #{user.lastname}"%> </a>
                                     </span><br>
                                     <span>DNI: <%= user.dni %></span>
                                 </div>

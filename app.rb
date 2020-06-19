@@ -22,7 +22,7 @@ class App < Sinatra::Base
   before do 
 
     @icons = "/images/icons/"
-    
+   
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
     
@@ -568,5 +568,5 @@ class App < Sinatra::Base
         end  
       end  
   end
- 
+
 end
