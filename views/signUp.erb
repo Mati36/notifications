@@ -2,31 +2,38 @@
 <html lang="es"> 
     <head>
         <meta charset = "utf-8">
-        <title>login</title>
-         <link rel="stylesheet" href="css/loginStyle.css">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+        <title>SignUp</title>
+        <script type="text/javascript" src="js/validation.js"></script>
+       
     </head>
     <body>
-        <div class="signUp">
-            <form action="/signUp" method="POST">
-                <label for="dni">DNI</label>
-                <input type="text" name="dni" / data-validation="number" > <br>
-                <label for="name">Nombre</label>
-                <input type="text" name="name" / data-validation="alphanumeric" > <br>
-                <label for="lastname">Apellido</label> 
-                <input type="text" name="lastname" / data-validation="alphanumeric" > <br>
-                <label for="email">Email</label> 
-                <input type="text" name="email" / data-validation="email" > <br>
-                <label for="pwd" >Contraseña</label> 
-                <input type="password" name="pwd" / data-validation="password"> <br>
-                <input type="submit" value="Crear Cuenta"> 
-            </form>
-            <form action="/login" method="GET">
-             </form>
-        </div>
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
-    </body>
+        <form class="w3-container " style="width:60%" action="/signUp" method="POST">
 
+            <p>
+                <label for="dni">DNI*</label>
+                <input id="dni" class="w3-input w3-border w3-round "type="text"  name="dni"  maxlength="8" pattern="[0-9]{8}" required 
+                    title="Ingrese un DNI valido">
+            </p>
+            <p>
+                <label for="name">Nombre*</label>
+                <input id="name"  class="w3-input w3-border w3-round" type="text" name="name" min="3" required> 
+            </p>
+            <p>
+                <label for="lastname">Apellido*</label> 
+                <input id="lastname" class="w3-input w3-border w3-round" type="text" name="lastname" min="3" required> 
+            </p>
+            <p>
+                <label for="email">Email*</label> 
+                <input id="email"  class="w3-input w3-border w3-round" type="text" name="email" 
+                        pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{1,63}$" required title="Correo electronico invalido"> 
+            </p>
+            <p>
+                <label for="pwd" >Contraseña*</label> 
+                <input id="pwd" class="w3-input w3-border w3-round" type="password" name="pwd" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$" 
+                    required title="Mínimo de ocho caracteres, al menos una letra mayúscula, una letra minúscula y un número"> 
+            </p>
+             <input id="send" class="w3-button w3-blue w3-roundw3-margin-right" type="submit" value="Crear Cuenta"> 
+        </form>
+
+    </body>
 </html>
