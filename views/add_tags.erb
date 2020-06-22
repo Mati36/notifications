@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es"> 
+    <head>
+        <meta charset = "utf-8">
+        <title>add_tags</title>
+        <link rel="stylesheet" href="css/loginStyle.css">
+        <link rel="stylesheet" href="css/documentsStyle.css">
+    </head>
+    <body>
+       <div class="">
+            <label for="tag" >Tags</label> 
+            <input class="w3-input w3-border w3-round" type="text" name="tag" id="tag">
+            <div class="filter w3-round-large w3-border" >
+               <ul id="filter_users" class="w3-ul w3-card w3-round-large " > </ul>
+            </div>
+        </div>
+        <script> 
+            
+            usersFilter(<%= @users%>); 
+            
+            function deselect(select_user) {
+                select_user.pop();
+            }
+
+            function lowerCase(elem){
+                return elem.toString().toLowerCase();
+            }
+            function match(user,params) {
+                return lowerCase(user).indexOf(lowerCase(params)) > -1; 
+            }
+            function arrayString(array){
+                return array.join('');
+            }    
+
+            function usersFilter(array) {
+                users = array;
+                var search = document.getElementById('tag');
+                var user_ul = document.getElementById('filter_users');
+                var select_user=[];
+                search.innerHTML = '';
+                search.addEventListener('keyup',e => {
+                    var lastChar = select_user.join('').length;    
+                    var text = search.value.substr(lastChar);
+                
+                    if (search.value.length < lastChar){
+                    deselect(select_user);
+                            search.value = arrayString(select_user);
+                    }
+                    
+                    
+                    user_ul.innerHTML = '';
+                    if (text != ''){
+                        
+                        var users_list = users.filter( function (user) {
+                            input_text = lowerCase(text);
+                            fullName = (user.name+' '+user.lastname).toLowerCase();
+                            email = lowerCase(user.email);
+                            return (match(user.dni,input_text) || match(user.name,input_text) 
+                                        || match(user.lastname,input_text) || match(fullName,input_text) 
+                                        || match(user.email,input_text)
+                                    );
+                                    
+                        });
+                        
+                        ulUser(users_list,user_ul);    
+                        
+                        for (let i = 0; i < users_list.length; i++) {
+                            document.getElementById('user_'+i).addEventListener('click', e=> {
+                                select_user.push('@' + users_list[i].dni.toString());
+                                search.value ='';
+                                search.value = arrayString(select_user);
+                                user_ul.innerHTML = '';
+                                
+                            }); 
+                        }
+                    }   
+                });
+            }
+        
+            function ulUser(users_list,ul) {
+                
+                for (let i = 0; i < users_list.length; i++) {
+                    var user = users_list[i];
+                    ul.innerHTML += ` <li id='user_${i}' class="w3-bar w3-hover-light-grey  " >
+                                                
+                                                <img src="${user.avatar_path}" 
+                                                    class="w3-bar-item w3-circle w3-tiny w3-margin-top " 
+                                                        style="width:55px">
+                                                    
+                                                <div class="w3-bar-item">
+                                                    
+                                                    <span class="w3-large"> 
+                                                        ${ user.name } ${user.lastname} 
+                                                    </span>
+                                                    <span class="w3-small"> - DNI: ${user.dni}  </span>
+                                                    </br>
+                                                    <span >${user.email}</span>
+                                                </div>
+                                            </li> `;
+                }
+            }
+       </script>
+    </body>
+</html>

@@ -7,178 +7,42 @@
         <link rel="stylesheet" href="css/documentsStyle.css">
     </head>
     <body>
-        <div class="save_document">
-            <form action="save_document" method="POST" enctype="multipart/form-data">
-                <label for="title">Titulo</label> 
-                <input type="text" name="title"> <br>
-                <label for="description">Descripcion</label> 
-                <input type="text" name="description"> <br>
-                <label for="tag" >Tags</label> 
-                <input type="text" name="tag" id="tag">
-                
-                <div class="filter w3-round-large ">
-                    <ul id="filter_users" class="w3-ul w3-card w3-border w3-round-large " > </ul>
+    <div class="w3-display-container "style="height:500px;" >
+        <form class="w3-margin-left"  action="save_document" method="POST" enctype="multipart/form-data">
+            <div class="w3-container w3-cell-row w3-padding-32 " >
+                    <div class="w3-display-bottommiddle w3-margin-bottom w3-padding-32" style="width:30%">
+                        <input id="send" class="w3-button w3-blue " type="submit" value="Subir Documento"> 
+                    </div>
+
+                <div id='validate' class="w3-container w3-cell w3-margin-top w3-display-topmiddle w3-hide-small" 
+                        style="width:40%" >
+                    <label for="title">Titulo</label> 
+                    <input id="title" class="w3-input w3-border w3-round" type="text" name="title" required> 
+                    <input id="doc" name="fileInput" type="file" accept= ".pdf, .jpg, .jpeg, .png"  required> </br></br>
                 </div>
                 
-                <label for="type" >Tipo</label> 
-                <select id="type" name="type"> 
-                    <option value="Act">Acta</option>
-                    <option value="Resolution">Resolucion</option>
-                </select> <br>
+                <div  class="   w3-display-middle" style="width:80%">
                 
-                <label for="select_topic" >Tendencia</label> 
-                <input type="text" name="select_topic" id="topic">
-                
-                <div class="filter w3-round-large ">
-                    <ul id="filter_topics" class="w3-ul w3-card w3-border w3-round-large " > </ul>
-                </div>
-                
-                </select> <br>
-                <input name="fileInput" type="file" accept= ".pdf, .jpg, .jpeg, .png"  /> <br>
-                <input type="submit" value="Subir Documento"> 
-            </form>
-        </div>
-        <script> 
-            
-            usersFilter(<%= @users%>); 
-            topicsFilter(<%= @topics %>);
-            
-            function deselect(select_user) {
-                select_user.pop();
-            }
+                    <div  class="w3-container w3-cell w3-margin-top w3-margin-top "
+                                style="width:50%" >
+                        <label for="description">Descripcion</label> 
+                        <input class="w3-input w3-border w3-round" type="text" name="description" maxlength="100"> 
+                        <label for="type" >Tipo</label> 
+                        <select id="type" name="type"> 
+                            <option value="Act">Acta</option>
+                            <option value="Resolution">Resolucion</option>
+                        </select> 
+                    </div>
 
-            function lowerCase(elem){
-                return elem.toString().toLowerCase();
-            }
-            function match(user,params) {
-                return lowerCase(user).indexOf(lowerCase(params)) > -1; 
-            }
-            function arrayString(array){
-                return array.join('');
-            }    
-
-            function usersFilter(array) {
-                users = array;
-                var search = document.getElementById('tag');
-                var user_ul = document.getElementById('filter_users');
-                var select_user=[];
-
-                search.innerHTML = '';
-                search.addEventListener('keyup',e => {
-                    var lastChar = select_user.join('').length;    
-                    var text = search.value.substr(lastChar);
-                
-                    if (search.value.length < lastChar){
-                    deselect(select_user);
-                            search.value = arrayString(select_user);
-                    }
-                    
-                    
-                    user_ul.innerHTML = '';
-                    if (text != ''){
-                        
-                        var users_list = users.filter( function (user) {
-                            input_text = lowerCase(text);
-                            fullName = (user.name+' '+user.lastname).toLowerCase();
-                            email = lowerCase(user.email);
-                            return (match(user.dni,input_text) || match(user.name,input_text) 
-                                        || match(user.lastname,input_text) || match(fullName,input_text) 
-                                        || match(user.email,input_text)
-                                    );
-                                    
-                        });
-                        
-                        ulUser(users_list,user_ul);    
-                        
-                        for (let i = 0; i < users_list.length; i++) {
-                            document.getElementById('user_'+i).addEventListener('click', e=> {
-                                select_user.push('@' + users_list[i].dni.toString());
-                                search.value ='';
-                                search.value = arrayString(select_user);
-                                user_ul.innerHTML = '';
-                            }); 
-                        }
-                    }
-                
-                });
-            }
-        function topicsFilter(array) {
-            
-            topics = array;
-            var search_topics = document.getElementById('topic');
-            var topic_ul = document.getElementById('filter_topics');
-            var select_topics=[];
-            search_topics.innerHTML = '';
-          
-            search_topics.addEventListener('keyup',e => {
-                var lastChar = select_topics.join('').length;    
-                var text = search_topics.value.substr(lastChar);
-            
-                if (search_topics.value.length < lastChar){
-                    deselect(select_topics);
-                    search_topics.value = arrayString(select_topics);
-                }
-                
-                
-                topic_ul.innerHTML = '';
-                if (text != ''){
-                    
-                    var topics_list = topics.filter( function (topic) {
-                        input_text = lowerCase(text);
-                        return (match(topic.name,input_text) );
-                                
-                    });
-
-                    ulTopics(topics_list,topic_ul);
-
-                    for (let i = 0; i < topics_list.length; i++) {
-                        document.getElementById('topic_'+i).addEventListener('click', e=> {
-                            select_topics.push('#' + topics_list[i].name.toString());
-                            search_topics.value ='';
-                            search_topics.value = arrayString(select_topics);
-                            topic_ul.innerHTML = '';
-                        }); 
-                    }
-                }
-            
-            });
-        }
-        function ulTopics(topics_list,ul) {
-            for (let i = 0; i < topics_list.length; i++) {
-                var topic = topics_list[i];
-                ul.innerHTML += ` <li id='topic_${i}' class="w3-bar w3-hover-light-grey  " >
-                                        <div class="w3-bar-item ">
-                                            <span class="w3-large"> 
-                                                ${ topic.name } 
-                                            </span>
-                                        </div>
-                                    </li> `;
-            }
-        }  
-        
-        function ulUser(users_list,ul) {
-            for (let i = 0; i < users_list.length; i++) {
-                var user = users_list[i];
-
-                ul.innerHTML += ` <li id='user_${i}' class="w3-bar w3-hover-light-grey  " >
-                                            
-                                            <img src="${user.avatar_path}" 
-                                                class="w3-bar-item w3-circle w3-tiny w3-margin-top " 
-                                                    style="width:55px">
-                                                
-                                            <div class="w3-bar-item">
-                                                
-                                                <span class="w3-large"> 
-                                                    ${ user.name } ${user.lastname} 
-                                                </span>
-                                                <span class="w3-small"> - DNI: ${user.dni}  </span>
-                                                </br>
-                                                <span >${user.email}</span>
-                                            </div>
-                                        </li> `;
-            }
-        }
-
-        </script>
+                    <div class="w3-container w3-cell w3-margin-top  " 
+                            style="width:50%">
+                        <%= erb :add_tags%>
+                        <%= erb :add_topics%>
+                    </div>
+                </div> 
+            </div>        
+        </form>
+        </div>   
+       
     </body>
 </html>

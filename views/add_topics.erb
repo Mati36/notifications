@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es"> 
+    <head>
+        <meta charset = "utf-8">
+        <title>add_topic</title>
+        <link rel="stylesheet" href="css/loginStyle.css">
+        <link rel="stylesheet" href="css/documentsStyle.css">
+    </head>
+    <body>
+       <div class="">
+            
+            <label for="select_topic" >Tendencia</label> 
+            <input class="w3-input w3-border w3-round" type="text" name="select_topic" id="topic">
+
+            <div class="filter w3-round-large ">
+                <ul id="filter_topics" class="w3-ul w3-card w3-border w3-round-large " > </ul>
+            </div>
+        </div>
+        <script> 
+            
+            topicsFilter(<%= @topics %>);
+            function lowerCase(elem){
+                return elem.toString().toLowerCase();
+            }
+            function match(user,params) {
+                return lowerCase(user).indexOf(lowerCase(params)) > -1; 
+            }
+            function arrayString(array){
+                return array.join('');
+            }    
+
+            function topicsFilter(array) {
+                
+                topics = array;
+                var search_topics = document.getElementById('topic');
+                var topic_ul = document.getElementById('filter_topics');
+                var select_topics=[];
+                search_topics.innerHTML = '';
+            
+                search_topics.addEventListener('keyup',e => {
+                    var lastChar = select_topics.join('').length;    
+                    var text = search_topics.value.substr(lastChar);
+                
+                    if (search_topics.value.length < lastChar){
+                        deselect(select_topics);
+                        search_topics.value = arrayString(select_topics);
+                    }
+                    
+                    
+                    topic_ul.innerHTML = '';
+                    if (text != ''){
+                        
+                        var topics_list = topics.filter( function (topic) {
+                            input_text = lowerCase(text);
+                            return (match(topic.name,input_text) );
+                                    
+                        });
+
+                        ulTopics(topics_list,topic_ul);
+
+                        for (let i = 0; i < topics_list.length; i++) {
+                            document.getElementById('topic_'+i).addEventListener('click', e=> {
+                                select_topics.push('#' + topics_list[i].name.toString());
+                                search_topics.value ='';
+                                search_topics.value = arrayString(select_topics);
+                                topic_ul.innerHTML = '';
+                            }); 
+                        }
+                    }
+                
+                });
+            }
+            function ulTopics(topics_list,ul) {
+                for (let i = 0; i < topics_list.length; i++) {
+                    var topic = topics_list[i];
+                    ul.innerHTML += ` <li id='topic_${i}' class="w3-bar w3-hover-light-grey  " >
+                                            <div class="w3-bar-item ">
+                                                <span class="w3-large"> 
+                                                    ${ topic.name } 
+                                                </span>
+                                            </div>
+                                        </li> `;
+                }
+            }  
+       </script>
+    </body>
+</html>

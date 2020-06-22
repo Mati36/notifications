@@ -8,6 +8,9 @@
       <% if request.path_info != '/signUp'%>
         <script type="text/javascript" src="js/socket.js"></script>
       <%end%>
+      <% if request.path_info == '/save_document'%>
+        <script type="text/javascript" src="js/validationDocument.js"></script>
+      <%end%>
   </head>
   <body>
     <%if @current_user%>

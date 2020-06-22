@@ -22,7 +22,7 @@ class App < Sinatra::Base
   before do 
 
     @icons = "/images/icons/"
-   
+    
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
     
@@ -276,32 +276,6 @@ class App < Sinatra::Base
     user_del_favorite_document(doc)
     redirect back 
   end  
-
-  get '/change_role/:action' do 
-    @act = params[:action]
-    erb :change_role 
-  end
-
-  post '/change_role/:action' do
-    action = params[:action]
-    user_tag = get_tags(params['tag']).first
-    if user_tag.oct == 0
-      @user = find_user_email(user_tag)
-    elsif user_tag.length >= 8 
-      @user =  find_user_dni(user_tag.to_i)
-    end
-    
-    if @user && @current_user.id != @user.id 
-      if action == 'delete_admin' && @user.is_admin && User.where(is_admin: true).all.length > 1
-        @user.update(is_admin: false, updated_at: date_time)
-      elsif action == 'add_admin'
-        @user.update(is_admin: true, updated_at: date_time)
-      end
-        redirect '/'
-    else 
-      redirect '/change_role'  
-    end  
-  end   
 
   get '/users_list' do
     @users = User.all
