@@ -1,9 +1,52 @@
-<form action="" method="POST">
-    <label for="type">Tipo</label>
-    <select id="type" name="type">
-        <option value="All">Todas</option> 
-        <option value="Act">Acta</option>
-        <option value="Resolution">Resolucion</option>
+<div class="w3-container w3-display-topleft" 
+    style="margin-left:280px!important; padding-top:40px!important">
+    <select class="w3-select w3-border w3-blue w3-round w3-card-2 w3-hover-light-grey" id="type_option" name="type" onclick="myFunction()">
+        <option class="w3-hover-light-grey" value="all">Todos</option> 
+        <option class="w3-hover-light-grey" value="act">Acta</option>
+        <option class="w3-hover-light-grey" value="resolution">Resolucion</option>
     </select> 
-    <button name="filter_type" type="submit" formaction="/choose_type">Filtrar</button>
-</form>  
+</div>
+<script>
+    const ALL = "all";
+    const ACT = "act";
+    const RESOLUTION ="resolution";
+
+   function myFunction() {
+        
+        var option, filter, table, tr, td, i;
+        option = document.getElementById("type_option");
+        filter = valueSlect(option.value); 
+        
+        table = document.getElementById("list");
+        tr = table.getElementsByTagName("tr");
+
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[1];
+
+            if (td) {
+                                   
+                if (filter != ALL ){
+                                   
+                  txtValue = td.textContent || td.innerText ;
+                    if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }      
+                }
+                else 
+                    tr[i].style.display = "";
+                
+            }
+        }
+   }    
+
+   function valueSlect(opt){
+       if (opt === ACT)
+        return "acta";
+       else if (opt === RESOLUTION)
+        return "resolucion";
+       
+       return ALL;  
+   }
+</script>

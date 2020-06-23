@@ -7,9 +7,11 @@
     </head>
     <body>
         <%= erb :search_input%>
+        <%= erb :filter_documents%>
         <table class="w3-table-all w3-hoverable w3-card-4" id="list">
             <tr class="w3-blue" >
                 <th>Titulo</th>
+                <th>Tipo</th>
                 <th>Fecha de subida</th>
                 <th>Descripcion</th>
                 <th></th>
@@ -33,6 +35,7 @@
                 <% if document.visibility %>   
                     <form action="" method="POST">
                         <td><a href = '/doc_view/<%= document.id%>' target="_blank" > <%= document.title%></a></td>
+                        <td><%= document.type == "Act" ? "Acta" : "Resolucion" %></a></td>
                         <td><%=document.created_at.to_date%></td>
                         <td><%=document.description%></td>
 
@@ -52,6 +55,7 @@
                 </tr>       
             <%end%>
         </table>
+         
     </body>
 </html>
 
