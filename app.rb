@@ -22,7 +22,6 @@ class App < Sinatra::Base
   before do 
 
     @icons = "/images/icons/"
-  
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
     
@@ -35,7 +34,7 @@ class App < Sinatra::Base
      if (@path == '/signUp')
         redirect '/'
       end  
-      if (!@current_user.is_admin && (@path == '/save_document' || @path == '/change_role' || @path == '/edit_document/:id'))
+      if (!@current_user.is_admin && (@path == '/save_document' || @path == '/change_role' ))
         redirect '/'
       end  
     end
@@ -237,17 +236,13 @@ class App < Sinatra::Base
     end    
   end  
 
-  get '/add_topic' do
-    erb :new_topic
-  end  
-
   post '/add_topic' do
     new_topic = Topic.new(name: params["topic"])
     if new_topic.valid?
       new_topic.save
-      redirect '/'
+      redirect back
     else
-      redirect '/add_topic'
+      redirect back
     end      
   end 
 
@@ -349,26 +344,31 @@ class App < Sinatra::Base
     end
   end  
 
-  get '/edit_document/:id' do 
-    if !@current_user.is_admin
-      redirect back
-    end  
-    erb :edit_document
-  end
+  # get '/edit_document/:id' do 
+  #   if !@current_user.is_admin
+  #     redirect back
+  #   end  
+  #   @document = Document.find(id: doc_id)
+  #   @tagged = Tag.where(document_id: doc_id, tag: true)
+  #   @topics = Document_topic.where(document_id: doc_id)
+  #   @topics_all = Topic.map{|x| x.to_hash}.to_json
+  #   @users_all  = User.exclude(id: @current_user.id).map{|x| x.to_hash}.to_json
+  #   erb :edit_document
+  # end
 
-  post '/edit_document/:id' do
-    doc_id =  params[:id].to_i
-    @document = Document.find(id: doc_id)
-    if params["title"].empty? || params["description"].empty?
-      path = request.path_info
-      redirect path
-    else
-      @document.update(title: params["title"], description: params["description"])
-      newTags = params["newTags"]
-      tags_user_document(newTags, @document)
-      redirect '/doc_view/'+doc_id.to_s
-    end 
-  end
+  # post '/edit_document/:id' do
+  #   doc_id =  params[:id].to_i
+  #   @document = Document.find(id: doc_id)
+  #   if params["title"].empty? || params["description"].empty?
+  #     path = request.path_info
+  #     redirect path
+  #   else
+  #     @document.update(title: params["title"], description: params["description"])
+  #     newTags = params["newTags"]
+  #     tags_user_document(newTags, @document)
+  #     redirect '/doc_view/'+doc_id.to_s
+  #   end 
+  # end
 
   post '/download_document' do
     doc_id = params["download_document"].to_i 

@@ -6,6 +6,9 @@
     </head>
     <body>
         <%= erb :search_input%>
+        <% if @current_user.is_admin%>
+            <%= erb :new_topic %>   
+        <% end %>    
         <table class="w3-bar w3-table-all w3-hoverable w3-card-4" id="list">
             <tr class="w3-blue" >
                 <th>Tendencias</th>

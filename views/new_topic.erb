@@ -3,20 +3,23 @@
     <head>
         <meta charset = "utf-8">
         <title>profile</title>
-        
+        <style>
+            w3-padding-24 {padding-top:45px!important;padding-bottom:45px!important}
+        </style>
     </head>
     <body>
-        <div class="/new_topic">
-            <form action="/add_topic" method="POST">
-                <label for="topic">Crear Tendencia</label> 
-                <input type="text" name="topic"> <br>
-                <input type="submit" value="Aceptar"> <br>  
-            </form>   
-        </div>
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
-
+        <form action="/add_topic" method="POST">
+                <div class="w3-display-topright w3-container w3-margin-top" 
+                    style="width:42%; padding-top:22px!important; ">
+                    <div class="w3-cell">
+                        <input class="w3-card w3-input w3-border w3-padding" type="text" name="topic" placeholder="Crear nueva tendencia" > 
+                    </div>
+                    <div class="w3-cell" style="padding-left:8px!important;">
+                        <input class="w3-card w3-button w3-round-large w3-center w3-blue"  type="submit" value="Aceptar"> 
+                    </div>
+                </div>
+            </div>
+        </form>   
     </body>
 
 </html>
