@@ -22,7 +22,7 @@ class App < Sinatra::Base
   before do 
 
     @icons = "/images/icons/"
-    
+  
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
     
@@ -159,18 +159,6 @@ class App < Sinatra::Base
     @user = find_user_id(@current_user.id)
     erb :documents
   end
-
-  post '/choose_type' do
-    type = params["type"]
-    if type == "Act"
-      @documents = Document.where(type: "Act").order(:created_at).reverse
-    elsif  type == "Resolution"
-      @documents = Document.where(type: "Resolution").order(:created_at).reverse
-    else
-      @documents = Document.order(:created_at).reverse
-    end  
-    erb :documents
-  end  
 
   get '/doc_view/:id' do
     doc_id =  params[:id].to_i
@@ -362,6 +350,9 @@ class App < Sinatra::Base
   end  
 
   get '/edit_document/:id' do 
+    if !@current_user.is_admin
+      redirect back
+    end  
     erb :edit_document
   end
 

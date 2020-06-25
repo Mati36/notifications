@@ -10,6 +10,9 @@
             <tr class="w3-blue" >
                 <th>Tendencias</th>
                 <th></th>
+                <%if @current_user.is_admin%>
+                    <th></th>
+                <%end%>
             </tr>
             <%@topics.each do |topic|%>
             <tr class="w3-hoverable"> 

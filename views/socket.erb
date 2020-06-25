@@ -18,10 +18,13 @@
       <div class="w3-display-bottomright notifContainer">
         <div class="w3-container w3-tiny ">
             <form id="form" action="/notifications" method="GET">
-              <button type="submit" id="btn_notyf" class="w3-button w3-center w3-circle w3-small" > 
-                <span name="span"  id="notification" class="w3-tag w3-red w3-large w3-circle "><%=get_notification_count(@current_user.id)%></span>              
-                 <i class="w3-xxlarge " > 
-                      <img  src=<%=@icons+"entypo_bell.png"%> ></span> </i>
+              <button type="submit" id="btn_notyf" class="w3-button w3-small w3-circle w3-padding-16"  > 
+                <span name="span"  id="notification" class="w3-badge w3-red w3-small w3-circle w3-margin-left ">
+                    <%=get_notification_count(@current_user.id)%>
+                </span>              
+                <i class="w3-xlarge w3-circle w3-margin-right"> 
+                    <img  src=<%=@icons+"bell.png"%> >
+                </i>
               </button>    
             </form>
         </div>
