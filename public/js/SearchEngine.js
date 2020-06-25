@@ -7,13 +7,15 @@ function myFunction() {
     pathname = window.location.pathname;
     for (i = 0; i < tr.length; i++) {
         
-        if ( pathname === '/topic_list' || pathname === '/users_list' )
+        if (pathname === '/users_list' )
             td = tr[i].getElementsByTagName("td")[1];
-        else if (pathname === '/documents' || pathname === '/my_tags' || pathname === '/my_favorites' || pathname === '/my_upload_documents')
+        else if (pathname === '/topic_list'  || pathname === '/documents' || pathname === '/my_tags' || pathname === '/my_favorites' || pathname === '/my_upload_documents')
             td = tr[i].getElementsByTagName("td")[0];
         
         if (td) {
             txtValue = td.textContent || td.innerText ;
+            console.log(txtValue);
+            
             if (txtValue.toUpperCase().indexOf(filter) > -1) {
                 tr[i].style.display = "";
             } else {

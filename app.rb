@@ -74,7 +74,7 @@ class App < Sinatra::Base
       User.order(user.id)
       redirect '/login'
     else
-      [401,{},"Usuario no registrado"]
+      redirect '/signUp'
     end 
   end
 
