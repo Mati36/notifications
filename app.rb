@@ -54,13 +54,14 @@ class App < Sinatra::Base
 
   def ws_open(ws)
     ws.onopen do
-      @connection = {socket: ws}
+      @connection = {user: @current_user.id, socket: ws}
       settings.sockets << @connection
     end
   end  
 
-  def ws_msj(msg)
-    EM.next_tick { settings.sockets.each { |s| s[:socket].send(msg.to_s)} }
+  def ws_msj
+    settings.sockets.each{|s| get_notification_count(s[:user])
+    s[:socket].send(@notif.to_s) }
   end  
 
   post '/signUp' do
@@ -400,10 +401,10 @@ class App < Sinatra::Base
         if !Tag.find(user_id: user.id, document_id: document.id)
           user.add_document(document)
         end
-        Tag.find(user_id: user.id, document_id: document.id).update(tag: true, check_notification: false)
-        ws_msj(get_notification_count(user.id)) 
+        Tag.find(user_id: user.id, document_id: document.id).update(tag: true, check_notification: false) 
       end  
     end
+    ws_msj
   end  
 
   def user_add_notification(document)
@@ -411,10 +412,10 @@ class App < Sinatra::Base
       if !user.nil? && !Tag.find(user_id: user.id, document_id: document.id)
         document.topics.each do |topic|
           if !find_document_user(user.id, document.id) && Subscription.find(user_id: user.id, topic_id: topic.id)
-            user.add_document(document)
-            ws_msj(get_notification_count(user.id)) 
+            user.add_document(document) 
           end
-        end   
+        end
+        ws_msj   
       end  
     end
   end 
@@ -519,7 +520,7 @@ class App < Sinatra::Base
   end   
   
   def get_notification_count(user_id)
-    Tag.where(user_id: user_id, check_notification: false).count
+    @notif = Tag.where(user_id: user_id, check_notification: false).count
   end
 
   def delete_old_notifications
