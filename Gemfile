@@ -7,6 +7,7 @@ gem 'pg'
 gem 'sinatra-websocket'
 gem 'thin' 
 gem 'bcrypt', '~> 3.1', '>= 3.1.11'
+gem 'pony'
 
 group :development do
   gem 'dotenv', '2.7.5'

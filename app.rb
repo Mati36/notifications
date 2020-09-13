@@ -415,7 +415,8 @@ class App < Sinatra::Base
             user.add_document(document) 
           end
         end
-        ws_msj   
+        ws_msj  
+        #send_mail(user.email, document)   
       end  
     end
   end 
@@ -533,6 +534,25 @@ class App < Sinatra::Base
           end 
         end  
       end  
+  end
+
+  def send_mail(mail, doc)
+    Pony.mail({
+      :to => mail, 
+      :via => :smtp, 
+      :via_options => {
+        :address => 'smtp.gmail.com',                     
+        :port => '587',
+        :user_name => 'nfilippa.amulen.unrc@gmail.com',
+        :password => 'unrc2019',
+        :authentication => :plain,
+        :domain => "gmail.com",
+      },
+        :subject => 'You have a new notification', 
+        :headers => { 'Content-Type' => 'text/html' },
+      }
+    )
+
   end
 
 end
