@@ -24,7 +24,8 @@ class App < Sinatra::Base
     @icons = "/images/icons/"
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
-    
+    # test_run(1)
+   
     if !@current_user && @path != '/login' && @path != '/signUp'
       redirect '/login'
     elsif @current_user
@@ -262,7 +263,7 @@ class App < Sinatra::Base
   end  
 
   get '/users_list' do
-    @users = User.all
+    @users = User.limit(2)
     erb :users_list
   end 
 
@@ -345,32 +346,6 @@ class App < Sinatra::Base
     end
   end  
 
-  # get '/edit_document/:id' do 
-  #   if !@current_user.is_admin
-  #     redirect back
-  #   end  
-  #   @document = Document.find(id: doc_id)
-  #   @tagged = Tag.where(document_id: doc_id, tag: true)
-  #   @topics = Document_topic.where(document_id: doc_id)
-  #   @topics_all = Topic.map{|x| x.to_hash}.to_json
-  #   @users_all  = User.exclude(id: @current_user.id).map{|x| x.to_hash}.to_json
-  #   erb :edit_document
-  # end
-
-  # post '/edit_document/:id' do
-  #   doc_id =  params[:id].to_i
-  #   @document = Document.find(id: doc_id)
-  #   if params["title"].empty? || params["description"].empty?
-  #     path = request.path_info
-  #     redirect path
-  #   else
-  #     @document.update(title: params["title"], description: params["description"])
-  #     newTags = params["newTags"]
-  #     tags_user_document(newTags, @document)
-  #     redirect '/doc_view/'+doc_id.to_s
-  #   end 
-  # end
-
   post '/download_document' do
     doc_id = params["download_document"].to_i 
     if !doc_id.nil?
@@ -403,6 +378,7 @@ class App < Sinatra::Base
         end
         Tag.find(user_id: user.id, document_id: document.id).update(tag: true, check_notification: false) 
       end  
+      send_mail(user.email, document)
     end
     ws_msj
   end  
@@ -416,7 +392,6 @@ class App < Sinatra::Base
           end
         end
         ws_msj  
-        #send_mail(user.email, document)   
       end  
     end
   end 
@@ -537,22 +512,57 @@ class App < Sinatra::Base
   end
 
   def send_mail(mail, doc)
-    Pony.mail({
+    @document = doc
+    # direc ="public/images/logounrc.png"
+    Pony.mail(
+      {
       :to => mail, 
       :via => :smtp, 
-      :via_options => {
+      :via_options => 
+      {
         :address => 'smtp.gmail.com',                     
         :port => '587',
-        :user_name => 'nfilippa.amulen.unrc@gmail.com',
+        :user_name => mail,
         :password => 'unrc2019',
         :authentication => :plain,
         :domain => "gmail.com",
       },
-        :subject => 'You have a new notification', 
+        :subject => 'Sistema de notificaciones UNRC', 
         :headers => { 'Content-Type' => 'text/html' },
+        :body => erb(:mail, layout: false),
       }
     )
 
   end
+
+  def consola(ms,var)
+    logger.info("#{ms} #{var}")
+  end  
+  
+  def upload_users_test()
+    pwd = "123"
+    create_user("Nuevo","Administrador",18576150,"admin@gmail.com",pwd).save
+    create_user("Matias","Lopez",40277612,"mati@gmail.com",pwd).save
+    create_user("Facundo","Fernandez",41258672,"facu@gmail.com",pwd).save
+    create_user("Nahuel","Filippa",38022379,"nahuel@gmail.com",pwd).save
+    create_user("Juan","Perez",31258672,"juan@gmail.com",pwd).save
+  end  
+  
+  def upload_topic_test()
+    Topic.new(name: "Exactas")
+    Topic.new(name: "Alumnos")
+    Topic.new(name: "Docentes")
+  end   
+
+  def test_run(id)
+    
+      if (User.all.length <= 0)
+        upload_users_test
+      end  
+      if (Topic.all.length <= 0)
+         upload_topic_test
+      end  
+      session[:user_id] = User[id].id
+  end 
 
 end

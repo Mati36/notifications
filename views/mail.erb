@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es"> 
+    <head>
+        <meta charset = "utf-8">
+        <title>mail</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="/css/docViewStyle.css">
+    </head>
+	<body>
+        <!--Mostrar titulo, descripcion, topico y usuarios etiquetados -->
+        <div class="lateralPane">
+            <div class="header">
+                <img src="https://www.unrc.edu.ar/img/logounrc.png" class="escudo">
+            </div>
+            <div class="content"> 
+                <div class="title"> <h2> Se le nombro en el documento: 
+                    <a href = 'http://localhost:9292/doc_view/<%= @document.id%>' target="_blank" > <%= @document.title%>
+                 </h2> </div>
+               <div class="description"><p>Descripcion: <%=@document.description%></p> </div>
+              
+            </div>
+        </div>
+
+        
+
+        </div>
+     
+    </body>
+</html>
