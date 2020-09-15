@@ -21,7 +21,7 @@ class App < Sinatra::Base
 
   before do 
 
-    test_run(1)
+    #test_run(1)
 
     @icons = "/images/icons/"
     @current_user = User.find(id: session[:user_id])

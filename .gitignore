@@ -1,2 +1,3 @@
 .bundle/
 public/files/
+Gemfile.lock
