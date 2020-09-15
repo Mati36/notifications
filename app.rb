@@ -265,7 +265,7 @@ class App < Sinatra::Base
   end  
 
   get '/users_list' do
-    @users = User.limit(2)
+    @users = User.all
     erb :users_list
   end 
 
