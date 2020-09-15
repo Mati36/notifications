@@ -14,15 +14,19 @@
                 <img src="https://www.unrc.edu.ar/img/logounrc.png" class="escudo">
             </div>
             <div class="content"> 
-                <div class="title"> <h2> Se le nombro en el documento: 
-                    <a href = 'http://localhost:9292/doc_view/<%= @document.id%>' target="_blank" > <%= @document.title%>
-                 </h2> </div>
-               <div class="description"><p>Descripcion: <%=@document.description%></p> </div>
-              
+                <div class="title"> 
+                    <h3>
+                        <%if @motive == 1%> 
+                            Se le nombro en el documento: 
+                        <%else%>
+                            Se agrego un documento con una tendencia en la que estas suscripto! 
+                        <%end%>       
+                        <a href = 'http://localhost:9292/doc_view/<%= @document.id%>' target="_blank" > <%= @document.title%>
+                    </h3> 
+                </div>
             </div>
         </div>
 
-        
 
         </div>
      

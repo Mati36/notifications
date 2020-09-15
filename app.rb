@@ -21,6 +21,8 @@ class App < Sinatra::Base
 
   before do 
 
+    test_run(1)
+
     @icons = "/images/icons/"
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
@@ -378,7 +380,7 @@ class App < Sinatra::Base
         end
         Tag.find(user_id: user.id, document_id: document.id).update(tag: true, check_notification: false) 
       end  
-      send_mail(user.email, document)
+      send_mail(user.email, document, 1) #motive 1: tag an user
     end
     ws_msj
   end  
@@ -389,6 +391,7 @@ class App < Sinatra::Base
         document.topics.each do |topic|
           if !find_document_user(user.id, document.id) && Subscription.find(user_id: user.id, topic_id: topic.id)
             user.add_document(document) 
+            send_mail(user.email, document, 2) #motive 2: A document was added with a topic that the user is subscribed to
           end
         end
         ws_msj  
@@ -511,9 +514,9 @@ class App < Sinatra::Base
       end  
   end
 
-  def send_mail(mail, doc)
+  def send_mail(mail, doc, motive)
     @document = doc
-    # direc ="public/images/logounrc.png"
+    @motive = motive
     Pony.mail(
       {
       :to => mail, 
@@ -522,8 +525,8 @@ class App < Sinatra::Base
       {
         :address => 'smtp.gmail.com',                     
         :port => '587',
-        :user_name => mail,
-        :password => 'unrc2019',
+        :user_name => 'notificacionesunrc@gmail.com',
+        :password => 'unrc2020',
         :authentication => :plain,
         :domain => "gmail.com",
       },
