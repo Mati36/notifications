@@ -317,3 +317,6 @@ Naming/MethodParameterName:
 # # URISchemes: http, https
 # Layout/LineLength:
 #   Max: 151
+
+Style/Documentation:
+  Enabled: false

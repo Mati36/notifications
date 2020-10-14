@@ -33,7 +33,7 @@ class App < Sinatra::Base
       redirect '/login'
     elsif @current_user
 
-      @notifications = get_notification
+      @notifications = retrieve_notifications
 
       redirect '/' if @path == '/signUp'
       redirect '/' if !@current_user.is_admin && (@path == '/save_document' || @path == '/change_role')
@@ -42,7 +42,8 @@ class App < Sinatra::Base
 
   get '/' do
     delete_old_notifications
-    @topics = Document_topic.group_and_count(:topic_id).order(:count).reverse.limit(10) # Ordena por count y se queda los primeros 10
+    # Ordena por count y se queda los primeros 10
+    @topics = Document_topic.group_and_count(:topic_id).order(:count).reverse.limit(10)
     if !request.websocket?
       erb :index
     else
@@ -61,7 +62,7 @@ class App < Sinatra::Base
 
   def ws_msj
     settings.sockets.each do |s|
-      get_notification_count(s[:user])
+      retrieve_notifications_count(s[:user])
       s[:socket].send(@notif.to_s)
     end
   end
@@ -99,26 +100,26 @@ class App < Sinatra::Base
   post '/save_document' do
     if params[:fileInput]
       file = params[:fileInput] [:tempfile]
-      @fileFormat = File.extname(file)
+      @file_format = File.extname(file)
       @directory = 'public/files/'
       @directory_temp = date_time.to_s
 
-      document = Document.new(title: params['title'], type: params['type'], format: @fileFormat,
+      document = Document.new(title: params['title'], type: params['type'], format: @file_format,
                               description: params['description'], user_id: @current_user.id,
                               path: @directory_temp, visibility: true)
 
       if document.valid?
         document.save
         @id = Document.last.id
-        @localPath = "#{@directory}#{@id}#{@fileFormat}"
-        document.update(path: "/files/#{@id}#{@fileFormat}")
+        @local_path = "#{@directory}#{@id}#{@file_format}"
+        document.update(path: "/files/#{@id}#{@file_format}")
 
-        tags_user_document(params['tag'], document)
+        tags_user(params['tag'], document)
         document_add_topic(document, params['select_topic'])
         user_add_notification(document)
 
-        cp(file.path, @localPath)
-        File.chmod(0o777, @localPath)
+        cp(file.path, @local_path)
+        File.chmod(0o777, @local_path)
         redirect '/'
 
       else
@@ -197,8 +198,8 @@ class App < Sinatra::Base
   post '/edit_profile' do
     if params[:fileInput]
       file = params[:fileInput][:tempfile]
-      @fileFormat = File.extname(file)
-      @localpath_avatar = "/images/avatars/#{@directory}#{@current_user.id}#{@fileFormat}"
+      @file_format = File.extname(file)
+      @localpath_avatar = "/images/avatars/#{@directory}#{@current_user.id}#{@file_format}"
       @current_user.update(avatar_path: @localpath_avatar)
       @directory = "public/#{@localpath_avatar}"
 
@@ -209,7 +210,8 @@ class App < Sinatra::Base
     if params['name'].empty? || params['lastname'].empty? || params['email'].empty?
       redirect '/edit_profile'
     else
-      @current_user.update(name: params['name'], lastname: params['lastname'], email: params['email'], updated_at: date_time)
+      @current_user.update(name: params['name'], lastname: params['lastname'],
+                           email: params['email'], updated_at: date_time)
       redirect "/profile/#{@current_user.id}"
     end
   end
@@ -235,12 +237,8 @@ class App < Sinatra::Base
 
   post '/add_topic' do
     new_topic = Topic.new(name: params['topic'])
-    if new_topic.valid?
-      new_topic.save
-      redirect back
-    else
-      redirect back
-    end
+    new_topic.save if new_topic.valid?
+    redirect back
   end
 
   post '/add_fav' do
@@ -340,13 +338,11 @@ class App < Sinatra::Base
     doc_id = params['download_document'].to_i
     unless doc_id.nil?
       doc = Document.find(id: doc_id)
-      if !doc.nil?
+      unless doc.nil?
         name_doc = "#{doc.id}#{doc.format}"
         send_file("public#{doc.path}", filename: name_doc, type: 'Application/octet-stream')
-        redirect back
-      else
-        redirect back
       end
+      redirect back
     end
   end
 
@@ -356,8 +352,8 @@ class App < Sinatra::Base
     DateTime.now.strftime('%m/%d/%Y: %T')
   end
 
-  def tags_user_document(tags_user, document)
-    users = get_tags(tags_user)
+  def tags_user(tag_user, document)
+    users = obtain_tags(tag_user)
 
     users.each do |user_dni|
       if !user_dni.empty? && !@current_user.dni.to_s.eql?(user_dni)
@@ -375,10 +371,11 @@ class App < Sinatra::Base
       next unless !user.nil? && !Tag.find(user_id: user.id, document_id: document.id)
 
       document.topics.each do |topic|
-        if !find_document_user(user.id, document.id) && Subscription.find(user_id: user.id, topic_id: topic.id)
-          user.add_document(document)
-          send_mail(user.email, document, 2) # motive 2: A document was added with a topic that the user is subscribed to
-        end
+        next unless !find_document_user(user.id, document.id) && Subscription.find(user_id: user.id, topic_id: topic.id)
+
+        user.add_document(document)
+        send_mail(user.email, document, 2)
+        # motive 2: A document was added with a topic that the user is subscribed to
       end
       ws_msj
     end
@@ -431,7 +428,7 @@ class App < Sinatra::Base
     User.find(email: current_email)
   end
 
-  def get_tags(tags_user)
+  def obtain_tags(tags_user)
     tags_user.split('@').reject(&:empty?)
   end
 
@@ -464,25 +461,25 @@ class App < Sinatra::Base
     end
   end
 
-  def get_notification
-    get_documents_user.reverse
+  def retrieve_notifications
+    documents_of_user.reverse
   end
 
-  def get_documents_user
+  def documents_of_user
     Tag.where(user_id: @current_user.id).order(:created_at)
   end
 
-  def get_notification_count(user_id)
+  def retrieve_notifications_count(user_id)
     @notif = Tag.where(user_id: user_id, check_notification: false).count
   end
 
   def delete_old_notifications
-    notification = get_documents_user
+    notification = documents_of_user
     limit_notification = 50
-    if notification.count > limit_notification
-      get_documents_user.limit(notification.count - limit_notification).offset(limit_notification).each do |n|
-        @current_user.remove_document(Document.find(id: n.document_id)) if n.check_notification && !n.tag && !n.favorite
-      end
+    return unless notification.count > limit_notification
+
+    documents_of_user.limit(notification.count - limit_notification).offset(limit_notification).each do |n|
+      @current_user.remove_document(Document.find(id: n.document_id)) if n.check_notification && !n.tag && !n.favorite
     end
   end
 
