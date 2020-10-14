@@ -1,13 +1,16 @@
+# frozen_string_literal: true
+
 ruby '2.6.4'
 source 'https://rubygems.org'
 
-gem 'sinatra', '2.0.7'
-gem 'sequel'
-gem 'pg'
-gem 'sinatra-websocket'
-gem 'thin' 
 gem 'bcrypt', '~> 3.1', '>= 3.1.11'
+gem 'pg'
 gem 'pony'
+gem 'rubocop', '~> 0.91.0', require: false
+gem 'sequel'
+gem 'sinatra', '2.0.7'
+gem 'sinatra-websocket'
+gem 'thin'
 
 group :development do
   gem 'dotenv', '2.7.5'
