@@ -9,6 +9,7 @@ DB = Sequel.connect(
   database: 'notificator_test',
   host: 'db',
   user: 'unicorn',
-  password: 'magic')
+  password: 'magic'
+)
 
 require File.expand_path './app.rb'
