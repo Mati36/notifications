@@ -22,11 +22,9 @@ class App < Sinatra::Base
   end
 
   before do
-    
     @icons = '/images/icons/'
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
-    
     if !@current_user && @path != '/login' && @path != '/signUp'
       redirect '/login'
     elsif @current_user
@@ -163,7 +161,7 @@ class App < Sinatra::Base
     @document = Document.find(id: doc_id)
     @tagged = Tag.where(document_id: doc_id, tag: true)
     @topics = Document_topic.where(document_id: doc_id)
-    Document.user_cheked_document(@document,@current_user)
+    Document.user_cheked_document(@document, @current_user)
     erb :doc_view, layout: false
   end
 
@@ -242,14 +240,14 @@ class App < Sinatra::Base
   post '/add_fav' do
     doc_id = params['add_favorite_doc']
     doc = Document.find(id: doc_id)
-    Document.user_add_favorite_document(doc,@current_user)
+    Document.user_add_favorite_document(doc, @current_user)
     redirect back
   end
 
   post '/del_fav' do
     doc_id = params['del_favorite_doc']
     doc = Document.find(id: doc_id)
-    Document.user_del_favorite_document(doc,@current_user)
+    Document.user_del_favorite_document(doc, @current_user)
     redirect back
   end
 
@@ -367,7 +365,8 @@ class App < Sinatra::Base
       next unless !user.nil? && !Tag.find(user_id: user.id, document_id: document.id)
 
       document.topics.each do |topic|
-        next unless !Tag.find(user_id: user.id, document_id: document.id)  && Subscription.find(user_id: user.id, topic_id: topic.id)
+        next unless !Tag.find(user_id: user.id, document_id: document.id) &&
+                    Subscription.find(user_id: user.id, topic_id: topic.id)
 
         user.add_document(document)
         send_mail(user.email, document, 2)
@@ -397,10 +396,10 @@ class App < Sinatra::Base
 
   def delete_old_notifications
     notification = Tag.documents_of_user(@current_user.id)
-    limit_notification = 50
-    return unless notification.count > limit_notification
-
-    Tag.documents_of_user(@current_user.id).limit(notification.count - limit_notification).offset(limit_notification).each do |n|
+    limit = 30
+    return unless notification.count > limit
+    
+    Tag.recent_notification(@current_user.id, notification.count, limit).each do |n|
       @current_user.remove_document(Document.find(id: n.document_id)) if n.check_notification && !n.tag && !n.favorite
     end
   end

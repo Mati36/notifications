@@ -25,5 +25,11 @@ class Tag < Sequel::Model(:documents_users)
     def notifications_count(user_id)
       where(user_id: user_id, check_notification: false).count
     end
+
+    def recent_notification(user_id, all, limit) 
+      documents_of_user(user_id)
+      .limit(all - limit)
+      .offset(limit)
+    end   
   end
 end

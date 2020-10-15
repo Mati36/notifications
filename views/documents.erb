@@ -39,7 +39,7 @@
                         <td><%=document.created_at.to_date%></td>
                         <td><%=document.description%></td>
 
-                        <% if !find_document_favorite(@current_user.id,document.id) && request.path_info != '/my_favorites' %> 
+                        <% if !Tag.find(user_id: @current_user.id, document_id: document.id, favorite: true) && request.path_info != '/my_favorites' %> 
                             <td><button class="w3-button" name="add_favorite_doc" type="submit" value="<%=document.id%>" formaction="/add_fav"><i><img src=" <%=@icons+"disabled-star.png"%>"></i></button> </td>
                         <%else%>
                             <td><button class="w3-button" name="del_favorite_doc" type="submit" value="<%=document.id%>" formaction="/del_fav"><i><img src="<%=@icons+"enabled-star.png"%>"></i></button> </td>
