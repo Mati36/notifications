@@ -27,5 +27,14 @@ class User < Sequel::Model
     def encrypt_password(password)
       BCrypt::Password.create(password, cost: 4)
     end
+
+    def create_user(name, lastname, dni, email, password)
+      user = User.new(name: name, lastname: lastname, dni: dni,
+                      email: email, password: User.encrypt_password(password))
+  
+      user.update(is_admin: true) if User.all.length <= 0
+  
+      user
+    end
   end
 end

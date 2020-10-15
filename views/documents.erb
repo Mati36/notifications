@@ -21,9 +21,9 @@
                 <% end %> 
             </tr>
             <%@documents.each do |document| 
-                doc = find_document_user(@current_user.id, document.id)
+                doc = Tag.find(user_id: @current_user.id, document_id: document.id) 
                 #hacer mas optimas estas validaciones 
-                if doc 
+                if !doc.nil? 
                     if doc.checked %>
                         <tr id="row" class="w3-hover-cyan w3-grey">    
                     <%else%>

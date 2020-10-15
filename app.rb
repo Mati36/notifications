@@ -22,8 +22,7 @@ class App < Sinatra::Base
   end
 
   before do
-    # test_run(1)
-
+    
     @icons = '/images/icons/'
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
@@ -71,7 +70,7 @@ class App < Sinatra::Base
     request.body.rewind
     hash = Rack::Utils.parse_nested_query(request.body.read)
     params = JSON.parse hash.to_json
-    user = create_user(params['name'], params['lastname'], params['dni'], params['email'], params['pwd'])
+    user = User.create_user(params['name'], params['lastname'], params['dni'], params['email'], params['pwd'])
 
     if user.valid?
       user.save
@@ -165,7 +164,7 @@ class App < Sinatra::Base
     @document = Document.find(id: doc_id)
     @tagged = Tag.where(document_id: doc_id, tag: true)
     @topics = Document_topic.where(document_id: doc_id)
-    user_cheked_document(@document)
+    Document.user_cheked_document(@document,@current_user)
     erb :doc_view, layout: false
   end
 
@@ -177,8 +176,8 @@ class App < Sinatra::Base
 
   post '/delete_doc' do
     doc_id = params['delete_doc']
-    delete_doc(Document.find(id: doc_id)) unless doc_id.nil?
-    redirect '/my_upload_documents'
+    Document.delete_doc(Document.find(id: doc_id)) unless doc_id.nil?
+    redirect back
   end
 
   get '/my_tags' do
@@ -244,14 +243,14 @@ class App < Sinatra::Base
   post '/add_fav' do
     doc_id = params['add_favorite_doc']
     doc = Document.find(id: doc_id)
-    user_add_favorite_document(doc)
+    Document.user_add_favorite_document(doc,@current_user)
     redirect back
   end
 
   post '/del_fav' do
     doc_id = params['del_favorite_doc']
     doc = Document.find(id: doc_id)
-    user_del_favorite_document(doc)
+    Document.user_del_favorite_document(doc,@current_user)
     redirect back
   end
 
@@ -371,7 +370,7 @@ class App < Sinatra::Base
       next unless !user.nil? && !Tag.find(user_id: user.id, document_id: document.id)
 
       document.topics.each do |topic|
-        next unless !find_document_user(user.id, document.id) && Subscription.find(user_id: user.id, topic_id: topic.id)
+        next unless !Tag.find(user_id: user.id, document_id: document.id)  && Subscription.find(user_id: user.id, topic_id: topic.id)
 
         user.add_document(document)
         send_mail(user.email, document, 2)
@@ -381,39 +380,12 @@ class App < Sinatra::Base
     end
   end
 
-  def user_cheked_document(document)
-    doc = find_document_user(@current_user.id, document.id)
-    if doc.nil?
-      @current_user.add_document(document)
-      doc = find_document_user(@current_user.id, document.id)
-    end
-    doc.update(checked: true, check_notification: true)
-  end
-
-  def user_add_favorite_document(document)
-    doc = find_document_user(@current_user.id, document.id)
-    if doc.nil?
-      @current_user.add_document(document)
-      doc = find_document_user(@current_user.id, document.id)
-    end
-    doc.update(favorite: true, check_notification: true)
-  end
-
-  def user_del_favorite_document(document)
-    doc = find_document_user(@current_user.id, document.id)
-    doc&.update(favorite: false, check_notification: true)
-  end
-
   def find_document_user(user_id, document_id)
     Tag.find(user_id: user_id, document_id: document_id)
   end
 
   def find_document_favorite(user_id, document_id)
     Tag.find(user_id: user_id, document_id: document_id, favorite: true)
-  end
-
-  def delete_doc(document)
-    document&.update(visibility: false)
   end
 
   def find_user_id(current_id)
@@ -444,15 +416,6 @@ class App < Sinatra::Base
       topic = Topic.find(name: topic_name)
       document.add_topic(topic) unless Document_topic.find(document_id: document.id, topic_id: topic.id)
     end
-  end
-
-  def create_user(name, lastname, dni, email, password)
-    user = User.new(name: name, lastname: lastname, dni: dni,
-                    email: email, password: User.encrypt_password(password))
-
-    user.update(is_admin: true) if User.all.length <= 0
-
-    user
   end
 
   def notifications_checked(notifications)
@@ -511,11 +474,11 @@ class App < Sinatra::Base
 
   def upload_users_test
     pwd = '123'
-    create_user('Nuevo', 'Administrador', 18_576_150, 'admin@gmail.com', pwd).save
-    create_user('Matias', 'Lopez', 40_277_612, 'mati@gmail.com', pwd).save
-    create_user('Facundo', 'Fernandez', 41_258_672, 'facu@gmail.com', pwd).save
-    create_user('Nahuel', 'Filippa', 38_022_379, 'nahuel@gmail.com', pwd).save
-    create_user('Juan', 'Perez', 31_258_672, 'juan@gmail.com', pwd).save
+    User.create_user('Nuevo', 'Administrador', 18_576_150, 'admin@gmail.com', pwd).save
+    User.create_user('Matias', 'Lopez', 40_277_612, 'mati@gmail.com', pwd).save
+    User.create_user('Facundo', 'Fernandez', 41_258_672, 'facu@gmail.com', pwd).save
+    User.create_user('Nahuel', 'Filippa', 38_022_379, 'nahuel@gmail.com', pwd).save
+    User.create_user('Juan', 'Perez', 31_258_672, 'juan@gmail.com', pwd).save
   end
 
   def upload_topic_test
