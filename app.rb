@@ -26,13 +26,12 @@ class App < Sinatra::Base
     @icons = '/images/icons/'
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
-    # test_run(1)
-
+    
     if !@current_user && @path != '/login' && @path != '/signUp'
       redirect '/login'
     elsif @current_user
 
-      @notifications = retrieve_notifications
+      @notifications = Tag.documents_of_user(@current_user.id).reverse
 
       redirect '/' if @path == '/signUp'
       redirect '/' if !@current_user.is_admin && (@path == '/save_document' || @path == '/change_role')
@@ -61,8 +60,8 @@ class App < Sinatra::Base
 
   def ws_msj
     settings.sockets.each do |s|
-      retrieve_notifications_count(s[:user])
-      s[:socket].send(@notif.to_s)
+      notif = Tag.notifications_count(s[:user])
+      s[:socket].send(notif.to_s)
     end
   end
 
@@ -143,7 +142,7 @@ class App < Sinatra::Base
   end
 
   post '/login' do
-    user = find_user_email(params['email'])
+    user = User.find_user_email(params['email'])
 
     if user && User.correct_password(user, params['pwd'])
       session[:user_id] = user.id
@@ -155,7 +154,7 @@ class App < Sinatra::Base
 
   get '/documents' do
     @documents = Document.order(:created_at).reverse
-    @user = find_user_id(@current_user.id)
+    @user = User.find_user_id(@current_user.id)
     erb :documents
   end
 
@@ -170,7 +169,7 @@ class App < Sinatra::Base
 
   get '/my_upload_documents' do
     @documents = Document.where(user_id: @current_user.id).order(:created_at).reverse
-    @user = find_user_id(@current_user.id)
+    @user = User.find_user_id(@current_user.id)
     erb :documents
   end
 
@@ -261,21 +260,21 @@ class App < Sinatra::Base
 
   post '/add_admin' do
     user_id = params['addAdmin_id']
-    user = find_user_id(user_id)
+    user = User.find_user_id(user_id)
     user&.update(is_admin: true)
     redirect back
   end
 
   post '/del_admin' do
     user_id = params['delAdmin_id']
-    user = find_user_id(user_id)
+    user = User.find_user_id(user_id)
     user&.update(is_admin: false)
     redirect back
   end
 
   post '/del_user' do
     user_id = params['delete_user_id']
-    user = find_user_id(user_id)
+    user = User.find_user_id(user_id)
     if user
       user.remove_all_documents
       user.remove_all_topics
@@ -345,8 +344,6 @@ class App < Sinatra::Base
     end
   end
 
-  # metodos
-
   def date_time
     DateTime.now.strftime('%m/%d/%Y: %T')
   end
@@ -356,7 +353,7 @@ class App < Sinatra::Base
 
     users.each do |user_dni|
       if !user_dni.empty? && !@current_user.dni.to_s.eql?(user_dni)
-        user = find_user_dni(user_dni)
+        user = User.find_user_dni(user_dni)
         user.add_document(document) unless Tag.find(user_id: user.id, document_id: document.id)
         Tag.find(user_id: user.id, document_id: document.id).update(tag: true, check_notification: false)
       end
@@ -380,26 +377,6 @@ class App < Sinatra::Base
     end
   end
 
-  def find_document_user(user_id, document_id)
-    Tag.find(user_id: user_id, document_id: document_id)
-  end
-
-  def find_document_favorite(user_id, document_id)
-    Tag.find(user_id: user_id, document_id: document_id, favorite: true)
-  end
-
-  def find_user_id(current_id)
-    User.find(id: current_id)
-  end
-
-  def find_user_dni(current_dni)
-    User.find(dni: current_dni)
-  end
-
-  def find_user_email(current_email)
-    User.find(email: current_email)
-  end
-
   def obtain_tags(tags_user)
     tags_user.split('@').reject(&:empty?)
   end
@@ -418,30 +395,12 @@ class App < Sinatra::Base
     end
   end
 
-  def notifications_checked(notifications)
-    notifications.each do |notification|
-      notification.update(check_notification: true)
-    end
-  end
-
-  def retrieve_notifications
-    documents_of_user.reverse
-  end
-
-  def documents_of_user
-    Tag.where(user_id: @current_user.id).order(:created_at)
-  end
-
-  def retrieve_notifications_count(user_id)
-    @notif = Tag.where(user_id: user_id, check_notification: false).count
-  end
-
   def delete_old_notifications
-    notification = documents_of_user
+    notification = Tag.documents_of_user(@current_user.id)
     limit_notification = 50
     return unless notification.count > limit_notification
 
-    documents_of_user.limit(notification.count - limit_notification).offset(limit_notification).each do |n|
+    Tag.documents_of_user(@current_user.id).limit(notification.count - limit_notification).offset(limit_notification).each do |n|
       @current_user.remove_document(Document.find(id: n.document_id)) if n.check_notification && !n.tag && !n.favorite
     end
   end
@@ -466,30 +425,5 @@ class App < Sinatra::Base
         body: erb(:mail, layout: false)
       }
     )
-  end
-
-  def consola(ms, var)
-    logger.info("#{ms} #{var}")
-  end
-
-  def upload_users_test
-    pwd = '123'
-    User.create_user('Nuevo', 'Administrador', 18_576_150, 'admin@gmail.com', pwd).save
-    User.create_user('Matias', 'Lopez', 40_277_612, 'mati@gmail.com', pwd).save
-    User.create_user('Facundo', 'Fernandez', 41_258_672, 'facu@gmail.com', pwd).save
-    User.create_user('Nahuel', 'Filippa', 38_022_379, 'nahuel@gmail.com', pwd).save
-    User.create_user('Juan', 'Perez', 31_258_672, 'juan@gmail.com', pwd).save
-  end
-
-  def upload_topic_test
-    Topic.new(name: 'Exactas')
-    Topic.new(name: 'Alumnos')
-    Topic.new(name: 'Docentes')
-  end
-
-  def test_run(id)
-    upload_users_test if User.all.length <= 0
-    upload_topic_test if Topic.all.length <= 0
-    session[:user_id] = User[id].id
   end
 end

@@ -36,5 +36,18 @@ class User < Sequel::Model
   
       user
     end
+
+    def find_user_id(current_id)
+      User.find(id: current_id)
+    end
+  
+    def find_user_dni(current_dni)
+      User.find(dni: current_dni)
+    end
+  
+    def find_user_email(current_email)
+      User.find(email: current_email)
+    end
+
   end
 end
