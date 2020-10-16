@@ -48,6 +48,5 @@ class User < Sequel::Model
     def find_user_email(current_email)
       User.find(email: current_email)
     end
-
-  end
+  end  
 end

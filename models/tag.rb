@@ -31,5 +31,15 @@ class Tag < Sequel::Model(:documents_users)
       .limit(all - limit)
       .offset(limit)
     end   
+
+    def delete_old_views(user)
+      notification = documents_of_user(user.id)
+      limit = 30
+      return unless notification.count > limit
+      
+      recent_notification(user.id, notification.count, limit).each do |n|
+        user.remove_document(Document.find(id: n.document_id)) if n.check_notification && !n.tag && !n.favorite
+      end
+    end
   end
 end

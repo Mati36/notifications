@@ -39,9 +39,19 @@ class Document < Sequel::Model
       doc.update(favorite: true, check_notification: true)
     end
 
-    def user_del_favorite_document(document,current_user)
+    def user_del_favorite_document(document,current_user) 
       doc = Tag.find(user_id: current_user.id, document_id: document.id)
       doc&.update(favorite: false, check_notification: true)
+    end
+
+    def add_topics(document, topics)
+      topics = topics.split('#').reject(&:empty?)
+      topics.each do |topic_name|
+        next if topic_name.empty?
+  
+        topic = Topic.find(name: topic_name)
+        document.add_topic(topic) unless Document_topic.find(document_id: document.id, topic_id: topic.id)
+      end
     end
   end   
 end

@@ -37,7 +37,7 @@ class App < Sinatra::Base
   end
 
   get '/' do
-    delete_old_notifications
+    Tag.delete_old_views(@current_user)
     # Ordena por count y se queda los primeros 10
     @topics = Document_topic.group_and_count(:topic_id).order(:count).reverse.limit(10)
     if !request.websocket?
@@ -111,7 +111,7 @@ class App < Sinatra::Base
         document.update(path: "/files/#{@id}#{@file_format}")
 
         tags_user(params['tag'], document)
-        document_add_topic(document, params['select_topic'])
+        Document.add_topics(document, params['select_topic'])
         user_add_notification(document)
 
         cp(file.path, @local_path)
@@ -362,11 +362,11 @@ class App < Sinatra::Base
 
   def user_add_notification(document)
     User.exclude(id: @current_user.id).each do |user|
-      next unless !user.nil? && !Tag.find(user_id: user.id, document_id: document.id)
+      user_tagged = Tag.find(user_id: user.id, document_id: document.id)
+      next unless !user.nil? && !user_tagged
 
       document.topics.each do |topic|
-        next unless !Tag.find(user_id: user.id, document_id: document.id) &&
-                    Subscription.find(user_id: user.id, topic_id: topic.id)
+        next unless !user_tagged && Subscription.find(user_id: user.id, topic_id: topic.id)
 
         user.add_document(document)
         send_mail(user.email, document, 2)
@@ -378,30 +378,6 @@ class App < Sinatra::Base
 
   def obtain_tags(tags_user)
     tags_user.split('@').reject(&:empty?)
-  end
-
-  def user_subscription(topic)
-    @current_user.add_topic(topic)
-  end
-
-  def document_add_topic(document, topics_document)
-    topics = topics_document.split('#').reject(&:empty?)
-    topics.each do |topic_name|
-      next if topic_name.empty?
-
-      topic = Topic.find(name: topic_name)
-      document.add_topic(topic) unless Document_topic.find(document_id: document.id, topic_id: topic.id)
-    end
-  end
-
-  def delete_old_notifications
-    notification = Tag.documents_of_user(@current_user.id)
-    limit = 30
-    return unless notification.count > limit
-    
-    Tag.recent_notification(@current_user.id, notification.count, limit).each do |n|
-      @current_user.remove_document(Document.find(id: n.document_id)) if n.check_notification && !n.tag && !n.favorite
-    end
   end
 
   def send_mail(mail, doc, motive)
