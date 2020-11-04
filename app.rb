@@ -9,6 +9,7 @@ class App < Sinatra::Base
   require 'sinatra-websocket'
   require 'bcrypt'
   require './controllers/account_controller.rb'
+  require './controllers/document_controller.rb'
   include BCrypt
   include FileUtils::Verbose
 
@@ -38,6 +39,7 @@ class App < Sinatra::Base
   end
 
   use Account_controller
+  use Document_controller
 
   get '/' do
     Tag.delete_old_views(@current_user)
@@ -90,45 +92,45 @@ class App < Sinatra::Base
   #   redirect '/'
   # end
 
-  get '/save_document' do
-    @topics = Topic.map(&:to_hash).to_json
-    @users  = User.exclude(id: @current_user.id).map(&:to_hash).to_json
-    erb :save_document
-  end
+  #get '/save_document' do
+  #  @topics = Topic.map(&:to_hash).to_json
+  #  @users  = User.exclude(id: @current_user.id).map(&:to_hash).to_json
+  #  erb :save_document
+  #end
 
-  post '/save_document' do
-    if params[:fileInput]
-      file = params[:fileInput] [:tempfile]
-      @file_format = File.extname(file)
-      @directory = 'public/files/'
-      @directory_temp = date_time.to_s
-
-      document = Document.new(title: params['title'], type: params['type'], format: @file_format,
-                              description: params['description'], user_id: @current_user.id,
-                              path: @directory_temp, visibility: true)
-
-      if document.valid?
-        document.save
-        @id = Document.last.id
-        @local_path = "#{@directory}#{@id}#{@file_format}"
-        document.update(path: "/files/#{@id}#{@file_format}")
-
-        tags_user(params['tag'], document)
-        Document.add_topics(document, params['select_topic'])
-        user_add_notification(document)
-
-        cp(file.path, @local_path)
-        File.chmod(0o777, @local_path)
-        redirect '/'
-
-      else
-        redirect '/save_document'
-      end
-
-    else
-      redirect '/save_document'
-    end
-  end
+  #post '/save_document' do
+  #  if params[:fileInput]
+  #    file = params[:fileInput] [:tempfile]
+  #    @file_format = File.extname(file)
+  #    @directory = 'public/files/'
+  #    @directory_temp = date_time.to_s
+#
+  #    document = Document.new(title: params['title'], type: params['type'], format: @file_format,
+  #                            description: params['description'], user_id: @current_user.id,
+  #                            path: @directory_temp, visibility: true)
+#
+  #    if document.valid?
+  #      document.save
+  #      @id = Document.last.id
+  #      @local_path = "#{@directory}#{@id}#{@file_format}"
+  #      document.update(path: "/files/#{@id}#{@file_format}")
+#
+  #      tags_user(params['tag'], document)
+  #      Document.add_topics(document, params['select_topic'])
+  #      user_add_notification(document)
+#
+  #      cp(file.path, @local_path)
+  #      File.chmod(0o777, @local_path)
+  #      redirect '/'
+#
+  #    else
+  #      redirect '/save_document'
+  #    end
+#
+  #  else
+  #    redirect '/save_document'
+  #  end
+  #end
 
   get '/users' do
     erb :users
@@ -153,11 +155,11 @@ class App < Sinatra::Base
   #   end
   # end
 
-  get '/documents' do
-    @documents = Document.order(:created_at).reverse
-    @user = User.find_user_id(@current_user.id)
-    erb :documents
-  end
+  #get '/documents' do
+  #  @documents = Document.order(:created_at).reverse
+  #  @user = User.find_user_id(@current_user.id)
+  #  erb :documents
+  #end
 
   get '/doc_view/:id' do
     doc_id =  params[:id].to_i
