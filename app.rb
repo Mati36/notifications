@@ -8,6 +8,7 @@ class App < Sinatra::Base
   require 'date'
   require 'sinatra-websocket'
   require 'bcrypt'
+  require './controllers/account_controller.rb'
   include BCrypt
   include FileUtils::Verbose
 
@@ -36,6 +37,8 @@ class App < Sinatra::Base
     end
   end
 
+  use Account_controller
+
   get '/' do
     Tag.delete_old_views(@current_user)
     # Ordena por count y se queda los primeros 10
@@ -63,29 +66,29 @@ class App < Sinatra::Base
     end
   end
 
-  post '/signUp' do
-    request.body.rewind
-    hash = Rack::Utils.parse_nested_query(request.body.read)
-    params = JSON.parse hash.to_json
-    user = User.create_user(params['name'], params['lastname'], params['dni'], params['email'], params['pwd'])
+  # post '/signUp' do
+  #   request.body.rewind
+  #   hash = Rack::Utils.parse_nested_query(request.body.read)
+  #   params = JSON.parse hash.to_json
+  #   user = User.create_user(params['name'], params['lastname'], params['dni'], params['email'], params['pwd'])
 
-    if user.valid?
-      user.save
-      User.order(user.id)
-      redirect '/login'
-    else
-      redirect '/signUp'
-    end
-  end
+  #   if user.valid?
+  #     user.save
+  #     User.order(user.id)
+  #     redirect '/login'
+  #   else
+  #     redirect '/signUp'
+  #   end
+  # end
 
-  get '/signUp' do
-    erb :signUp
-  end
+  # get '/signUp' do
+  #   erb :signUp
+  # end
 
-  get '/log_out' do
-    session.clear if @current_user
-    redirect '/'
-  end
+  # get '/log_out' do
+  #   session.clear if @current_user
+  #   redirect '/'
+  # end
 
   get '/save_document' do
     @topics = Topic.map(&:to_hash).to_json
@@ -131,24 +134,24 @@ class App < Sinatra::Base
     erb :users
   end
 
-  get '/login' do
-    if @current_user
-      redirect '/'
-    else
-      erb :login
-    end
-  end
+  # get '/login' do
+  #   if @current_user
+  #     redirect '/'
+  #   else
+  #     erb :login
+  #   end
+  # end
 
-  post '/login' do
-    user = User.find_user_email(params['email'])
+  # post '/login' do
+  #   user = User.find_user_email(params['email'])
 
-    if user && User.correct_password(user, params['pwd'])
-      session[:user_id] = user.id
-      redirect '/'
-    else
-      redirect '/login'
-    end
-  end
+  #   if user && User.correct_password(user, params['pwd'])
+  #     session[:user_id] = user.id
+  #     redirect '/'
+  #   else
+  #     redirect '/login'
+  #   end
+  # end
 
   get '/documents' do
     @documents = Document.order(:created_at).reverse
