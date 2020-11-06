@@ -65,4 +65,23 @@ class User_controller < Sinatra::Base
         end
         redirect back
     end
+
+    get '/profile/:user_id' do
+        @user = User.find(id: params[:user_id])
+        erb :profile
+      end
+    
+    get '/edit_profile' do
+        erb :edit_profile
+    end
+
+    post '/edit_profile' do
+        file = params[:fileInput][:tempfile] if params[:fileInput] 
+        begin
+            User_service.edit_profile(@current_user,file,params['name'],params['lastname'],params['email'])
+            redirect "/profile/#{@current_user.id}"
+        rescue Validation_model_error => e
+            return redirect back
+        end
+    end    
 end    

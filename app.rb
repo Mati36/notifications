@@ -187,35 +187,35 @@ class App < Sinatra::Base
     erb :documents
   end
 
-  get '/profile/:user_id' do
-    @user = User.find(id: params[:user_id])
-    erb :profile
-  end
+  # get '/profile/:user_id' do
+  #   @user = User.find(id: params[:user_id])
+  #   erb :profile
+  # end
 
-  get '/edit_profile' do
-    erb :edit_profile
-  end
+  # get '/edit_profile' do
+  #   erb :edit_profile
+  # end
 
-  post '/edit_profile' do
-    if params[:fileInput]
-      file = params[:fileInput][:tempfile]
-      @file_format = File.extname(file)
-      @localpath_avatar = "/images/avatars/#{@directory}#{@current_user.id}#{@file_format}"
-      @current_user.update(avatar_path: @localpath_avatar)
-      @directory = "public/#{@localpath_avatar}"
+  # post '/edit_profile' do
+  #   file = params[:fileInput][:tempfile]
+  #   if file
+  #     @file_format = File.extname(file)
+  #     @localpath_avatar = "/images/avatars/#{@directory}#{@current_user.id}#{@file_format}"
+  #     @current_user.update(avatar_path: @localpath_avatar)
+  #     @directory = "public/#{@localpath_avatar}"
 
-      cp(file.path, @directory)
-      File.chmod(0o777, @directory)
-    end
+  #     cp(file.path, @directory)
+  #     File.chmod(0o777, @directory)
+  #   end
 
-    if params['name'].empty? || params['lastname'].empty? || params['email'].empty?
-      redirect '/edit_profile'
-    else
-      @current_user.update(name: params['name'], lastname: params['lastname'],
-                           email: params['email'], updated_at: date_time)
-      redirect "/profile/#{@current_user.id}"
-    end
-  end
+  #   if params['name'].empty? || params['lastname'].empty? || params['email'].empty?
+  #     redirect '/edit_profile'
+  #   else
+  #     @current_user.update(name: params['name'], lastname: params['lastname'],
+  #                          email: params['email'], updated_at: date_time)
+  #     redirect "/profile/#{@current_user.id}"
+  #   end
+  # end
 
   # get '/change_password' do
   #   erb :change_password

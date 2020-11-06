@@ -51,4 +51,23 @@ class User_service
         user.remove_all_topics
         user.delete
    end    
+
+   def self.edit_profile(user,file_img,name_edited,lastname_edited,email_edited)
+        if file_img
+            file_name = "avatar_#{user.id}"
+            localpath_avatar = "/images/avatars/#{file_name}#{File.extname(file_img)}"
+            user.update(avatar_path: localpath_avatar)
+            directory = "public/#{localpath_avatar}"
+            
+            File.open(directory, 'wb') do |f|
+                f.write(file_img.read)
+            end
+        end
+
+        if name_edited.empty? || lastname_edited.empty? || email_edited.empty?
+            raise Validation_model_error.new("Datos vacios")
+        end
+        user.update(name:name_edited, lastname: lastname_edited,
+                    email: email_edited, updated_at: DateTime.now.strftime('%m/%d/%Y: %T'))
+    end 
 end    
