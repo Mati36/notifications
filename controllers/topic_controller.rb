@@ -2,7 +2,7 @@ require 'json'
 require './services/topic_service.rb'
 require 'sinatra/base'
 require './exceptions/validation_model_error.rb'
-
+require './exceptions/unexistent_element_error.rb'
 
 class Topic_controller < Sinatra::Base
   configure :development, :production do
@@ -11,6 +11,7 @@ class Topic_controller < Sinatra::Base
 
   before do
     @current_user = User.find(id: session[:user_id])
+    @icons = '/images/icons/'
   end
 
   post '/add_topic' do
@@ -28,21 +29,29 @@ class Topic_controller < Sinatra::Base
   end
 
   post '/delete_topic' do
-    topic_id = params['del_topic']
-    Topic_service.delete_topic(topic_id)
-    redirect back
+    begin
+      Topic_service.delete_topic(params['del_topic'])
+      redirect back
+    rescue Unexistent_element_error => e
+      redirect back
+    end
   end
 
   post '/subscription_topic' do
-    topic = Topic.find(id: params['sub_topic'])
-    @current_user.add_topic(topic)
-    redirect back
+    begin
+      Topic_service.subscribe_topic(@current_user, params['sub_topic'])
+      redirect back
+    rescue Unexistent_element_error => e
+      redirect back
+    end
   end
 
   post '/del_subscription_topic' do
-    topic = Topic.find(id: params['sub_topic'])
-    @current_user.remove_topic(topic)
-    redirect back
+    begin
+      Topic_service.desubscribe_topic(@current_user, params['sub_topic'])
+      redirect back
+    rescue Unexistent_element_error => e
+      redirect back
+    end
   end
-
 end
