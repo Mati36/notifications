@@ -98,5 +98,14 @@ class Document_controller < Sinatra::Base
     erb :documents
   end
 
+  post '/delete_doc' do
+    doc_id = params['delete_doc']
+    begin
+      Document_service.delete_doc(doc_id) 
+      redirect back
+    rescue File_not_found => e 
+      redirect back
+    end  
+  end
   
 end 

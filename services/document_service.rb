@@ -19,7 +19,7 @@ class Document_service
       document.update(path: "/files/#{id}#{file_format}")
 
       #App.tags_user(tag, document)
-      Document.add_topics(document, topic)
+      add_topics(document, topic)
       #App.user_add_notification(document)
 
       FileUtils.cp(file.path, @local_path)
@@ -70,8 +70,12 @@ class Document_service
     user_cheked_document(document, current_user)
   end
 
-  def self.delete_doc(document)
-    document&.update(visibility: false) unless document.nil?
+  def self.delete_doc(doc_id)
+    document = Document.find(id: doc_id)
+    unless document
+      raise File_not_found.new("Archivo inexistente")
+    end   
+    document.update(visibility: false) 
   end
 
   def self.user_add_favorite_document(document,current_user)
