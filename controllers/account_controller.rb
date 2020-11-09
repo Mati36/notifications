@@ -6,16 +6,13 @@ require './exceptions/validation_model_error.rb'
 class Account_controller < Sinatra::Base
     
   configure :development, :production do
-      set :views, settings.root + '/../views'
+    set :views, settings.root + '/../views'
   end
 
-  before do
+  before do 
     @current_user = User.find(id: session[:user_id])
-  end
-
-  before do
-    @current_user = User.find_user_id(session[:user_id])
-  end    
+    @icons = '/images/icons/'
+  end 
 
   post '/signUp' do
     name = params[:name]
