@@ -6,12 +6,12 @@ require './exceptions/validation_model_error.rb'
 class Account_controller < Sinatra::Base
     
   configure :development, :production do
-    enable :logging
-    enable :session
     set :views, settings.root + '/../views'
-    set :session_secret, 'inhakiable papuuu'
-    set :sessions, true
   end
+
+  before do
+    @current_user = User.find_user_id(session[:user_id])
+  end    
 
   post '/signUp' do
     
@@ -48,8 +48,7 @@ class Account_controller < Sinatra::Base
 
   post '/login' do
     user = User.find_user_email(params['email'])
-
-    if user && User.correct_password(user, params['pwd'])
+    if user && User_service.correct_password(user, params['pwd'])
       session[:user_id] = user.id
       redirect '/'
     else

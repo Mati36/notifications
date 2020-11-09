@@ -9,6 +9,7 @@ class App < Sinatra::Base
   require 'sinatra-websocket'
   require 'bcrypt'
   require './controllers/account_controller.rb'
+  require './controllers/user_controller.rb'
   include BCrypt
   include FileUtils::Verbose
 
@@ -37,8 +38,6 @@ class App < Sinatra::Base
     end
   end
 
-  use Account_controller
-
   get '/' do
     Tag.delete_old_views(@current_user)
     # Ordena por count y se queda los primeros 10
@@ -51,6 +50,9 @@ class App < Sinatra::Base
       end
     end
   end
+
+  use Account_controller
+  use User_controller
 
   def ws_open(ws)
     ws.onopen do
@@ -130,9 +132,9 @@ class App < Sinatra::Base
     end
   end
 
-  get '/users' do
-    erb :users
-  end
+  # get '/users' do
+  #   erb :users
+  # end
 
   # get '/login' do
   #   if @current_user
@@ -185,54 +187,54 @@ class App < Sinatra::Base
     erb :documents
   end
 
-  get '/profile/:user_id' do
-    @user = User.find(id: params[:user_id])
-    erb :profile
-  end
+  # get '/profile/:user_id' do
+  #   @user = User.find(id: params[:user_id])
+  #   erb :profile
+  # end
 
-  get '/edit_profile' do
-    erb :edit_profile
-  end
+  # get '/edit_profile' do
+  #   erb :edit_profile
+  # end
 
-  post '/edit_profile' do
-    if params[:fileInput]
-      file = params[:fileInput][:tempfile]
-      @file_format = File.extname(file)
-      @localpath_avatar = "/images/avatars/#{@directory}#{@current_user.id}#{@file_format}"
-      @current_user.update(avatar_path: @localpath_avatar)
-      @directory = "public/#{@localpath_avatar}"
+  # post '/edit_profile' do
+  #   file = params[:fileInput][:tempfile]
+  #   if file
+  #     @file_format = File.extname(file)
+  #     @localpath_avatar = "/images/avatars/#{@directory}#{@current_user.id}#{@file_format}"
+  #     @current_user.update(avatar_path: @localpath_avatar)
+  #     @directory = "public/#{@localpath_avatar}"
 
-      cp(file.path, @directory)
-      File.chmod(0o777, @directory)
-    end
+  #     cp(file.path, @directory)
+  #     File.chmod(0o777, @directory)
+  #   end
 
-    if params['name'].empty? || params['lastname'].empty? || params['email'].empty?
-      redirect '/edit_profile'
-    else
-      @current_user.update(name: params['name'], lastname: params['lastname'],
-                           email: params['email'], updated_at: date_time)
-      redirect "/profile/#{@current_user.id}"
-    end
-  end
+  #   if params['name'].empty? || params['lastname'].empty? || params['email'].empty?
+  #     redirect '/edit_profile'
+  #   else
+  #     @current_user.update(name: params['name'], lastname: params['lastname'],
+  #                          email: params['email'], updated_at: date_time)
+  #     redirect "/profile/#{@current_user.id}"
+  #   end
+  # end
 
-  get '/change_password' do
-    erb :change_password
-  end
+  # get '/change_password' do
+  #   erb :change_password
+  # end
 
-  post '/change_password' do
-    new_pwd = params['pass1']
-    rep_new_pwd = params['pass2']
-    if User.correct_password(@current_user, params['current_pass'])
-      if new_pwd == rep_new_pwd
-        @current_user.update(password: User.encrypt_password(new_pwd))
-        redirect '/edit_profile'
-      else
-        redirect '/change_password'
-      end
-    else
-      redirect '/change_password'
-    end
-  end
+  # post '/change_password' do
+  #   new_pwd = params['pass1']
+  #   rep_new_pwd = params['pass2']
+  #   if User.correct_password(@current_user, params['current_pass'])
+  #     if new_pwd == rep_new_pwd
+  #       @current_user.update(password: User.encrypt_password(new_pwd))
+  #       redirect '/edit_profile'
+  #     else
+  #       redirect '/change_password'
+  #     end
+  #   else
+  #     redirect '/change_password'
+  #   end
+  # end
 
   post '/add_topic' do
     new_topic = Topic.new(name: params['topic'])
@@ -254,35 +256,35 @@ class App < Sinatra::Base
     redirect back
   end
 
-  get '/users_list' do
-    @users = User.all
-    erb :users_list
-  end
+  # get '/users_list' do
+  #   @users = User.all
+  #   erb :users_list
+  # end
 
-  post '/add_admin' do
-    user_id = params['addAdmin_id']
-    user = User.find_user_id(user_id)
-    user&.update(is_admin: true)
-    redirect back
-  end
+  # post '/add_admin' do
+  #   user_id = params['addAdmin_id']
+  #   user = User.find_user_id(user_id)
+  #   user&.update(is_admin: true)
+  #   redirect back
+  # end
 
-  post '/del_admin' do
-    user_id = params['delAdmin_id']
-    user = User.find_user_id(user_id)
-    user&.update(is_admin: false)
-    redirect back
-  end
+  # post '/del_admin' do
+  #   user_id = params['delAdmin_id']
+  #   user = User.find_user_id(user_id)
+  #   user&.update(is_admin: false)
+  #   redirect back
+  # end
 
-  post '/del_user' do
-    user_id = params['delete_user_id']
-    user = User.find_user_id(user_id)
-    if user
-      user.remove_all_documents
-      user.remove_all_topics
-      user.delete
-    end
-    redirect back
-  end
+  # post '/del_user' do
+  #   user_id = params['delete_user_id']
+  #   user = User.find_user_id(user_id)
+  #   if user
+  #     user.remove_all_documents
+  #     user.remove_all_topics
+  #     user.delete
+  #   end
+  #   redirect back
+  # end
 
   get '/my_favorites' do
     @documents = Document.join(Tag.where(user_id: @current_user.id, favorite: true), document_id: :id)
