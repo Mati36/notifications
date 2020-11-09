@@ -12,7 +12,7 @@ class User_service
 
     def self.create_user(name, lastname, dni, email, password)
         user = User.new(name: name, lastname: lastname, dni: dni,
-                        email: email, password: User.encrypt_password(password))
+                        email: email, password: encrypt_password(password))
 
         user.update(is_admin: true) if User.all.length <= 0
         user
