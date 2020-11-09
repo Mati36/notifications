@@ -5,7 +5,6 @@ class App < Sinatra::Base
   require 'json'
   require 'sinatra'
   require './models/init.rb'
-  require 'date'
   require 'sinatra-websocket'
   require 'bcrypt'
   require './controllers/account_controller.rb'
@@ -24,6 +23,7 @@ class App < Sinatra::Base
   end
 
   before do
+    test_run(1)
     @icons = '/images/icons/'
     @current_user = User.find(id: session[:user_id])
     @path = request.path_info
@@ -161,31 +161,31 @@ class App < Sinatra::Base
   #  erb :documents
   #end
 
-  get '/doc_view/:id' do
-    doc_id =  params[:id].to_i
-    @document = Document.find(id: doc_id)
-    @tagged = Tag.where(document_id: doc_id, tag: true)
-    @topics = Document_topic.where(document_id: doc_id)
-    Document.user_cheked_document(@document, @current_user)
-    erb :doc_view, layout: false
-  end
+  #get '/doc_view/:id' do
+  #  doc_id =  params[:id].to_i
+  #  @document = Document.find(id: doc_id)
+  #  @tagged = Tag.where(document_id: doc_id, tag: true)
+  #  @topics = Document_topic.where(document_id: doc_id)
+  #  Document.user_cheked_document(@document, @current_user)
+  #  erb :doc_view, layout: false
+  #end
 
-  get '/my_upload_documents' do
-    @documents = Document.where(user_id: @current_user.id).order(:created_at).reverse
-    @user = User.find_user_id(@current_user.id)
-    erb :documents
-  end
+  #get '/my_upload_documents' do
+  #  @documents = Document.where(user_id: @current_user.id).order(:created_at).reverse
+  #  @user = User.find_user_id(@current_user.id)
+  #  erb :documents
+  #end
 
-  post '/delete_doc' do
-    doc_id = params['delete_doc']
-    Document.delete_doc(Document.find(id: doc_id)) unless doc_id.nil?
-    redirect back
-  end
+  #post '/delete_doc' do
+  #  doc_id = params['delete_doc']
+  #  Document.delete_doc(Document.find(id: doc_id)) unless doc_id.nil?
+  #  redirect back
+  #end
 
-  get '/my_tags' do
-    @documents = Document.join(Tag.where(user_id: @current_user.id, tag: true), document_id: :id)
-    erb :documents
-  end
+  #get '/my_tags' do
+  #  @documents = Document.join(Tag.where(user_id: @current_user.id, tag: true), document_id: :id)
+  #  erb :documents
+  #end
 
   get '/profile/:user_id' do
     @user = User.find(id: params[:user_id])
@@ -335,17 +335,17 @@ class App < Sinatra::Base
     end
   end
 
-  post '/download_document' do
-    doc_id = params['download_document'].to_i
-    unless doc_id.nil?
-      doc = Document.find(id: doc_id)
-      unless doc.nil?
-        name_doc = "#{doc.id}#{doc.format}"
-        send_file("public#{doc.path}", filename: name_doc, type: 'Application/octet-stream')
-      end
-      redirect back
-    end
-  end
+  # post '/download_document' do
+  #  doc_id = params['download_document'].to_i
+  #  unless doc_id.nil?
+  #    doc = Document.find(id: doc_id)
+  #    unless doc.nil?
+  #      name_doc = "#{doc.id}#{doc.format}"
+  #      send_file("public#{doc.path}", filename: name_doc, type: 'Application/octet-stream')
+  #    end
+  #    redirect back
+  #  end
+  # end
 
   def date_time
     DateTime.now.strftime('%m/%d/%Y: %T')
@@ -406,4 +406,32 @@ class App < Sinatra::Base
       }
     )
   end
+
+  def upload_users_test()
+    pwd = "123"
+    create_user("Nuevo","Administrador",18576150,"admin@gmail.com",pwd).save
+    create_user("Matias","Lopez",40277612,"mati@gmail.com",pwd).save
+    create_user("Facundo","Fernandez",41258672,"facu@gmail.com",pwd).save
+    create_user("Nahuel","Filippa",38022379,"nahuel@gmail.com",pwd).save
+    create_user("Juan","Perez",31258672,"juan@gmail.com",pwd).save
+  end  
+  
+  def upload_topic_test()
+    Topic.new(name: "Exactas")
+    Topic.new(name: "Alumnos")
+    Topic.new(name: "Docentes")
+  end   
+
+  def test_run(id)
+    
+      if (User.all.length <= 0)
+        upload_users_test
+      end  
+      if (Topic.all.length <= 0)
+         upload_topic_test
+      end  
+      session[:user_id] = User[id].id
+  end 
+
+
 end

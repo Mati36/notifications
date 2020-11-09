@@ -6,11 +6,12 @@ require './exceptions/validation_model_error.rb'
 class Account_controller < Sinatra::Base
     
   configure :development, :production do
-    enable :logging
-    enable :session
     set :views, settings.root + '/../views'
-    set :session_secret, 'inhakiable papuuu'
-    set :sessions, true
+  end
+
+  before do 
+    @current_user = User.find(id: session[:user_id])
+    @icons = '/images/icons/'
   end
 
   post '/signUp' do
