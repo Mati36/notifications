@@ -12,10 +12,9 @@ class Account_controller < Sinatra::Base
   before do 
     @current_user = User.find(id: session[:user_id])
     @icons = '/images/icons/'
-  end
+  end 
 
   post '/signUp' do
-    
     name = params[:name]
     lastname = params[:lastname]
     dni = params[:dni]
@@ -49,8 +48,7 @@ class Account_controller < Sinatra::Base
 
   post '/login' do
     user = User.find_user_email(params['email'])
-
-    if user && User.correct_password(user, params['pwd'])
+    if user && User_service.correct_password(user, params['pwd'])
       session[:user_id] = user.id
       redirect '/'
     else
