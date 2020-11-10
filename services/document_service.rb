@@ -19,11 +19,9 @@ class Document_service
       id = Document.last.id
       local_path = "public/files/#{title}_#{id}#{file_format}"
       document.update(path: "/files/#{title}_#{id}#{file_format}")
-
       Tag_service.tags_user(tag, document, current_user)
       add_topics(document, topic)
       Tag_service.user_add_notification(document,current_user)
-
       FileUtils.cp(file.path, local_path)
       File.chmod(0o777, local_path)
   end  
