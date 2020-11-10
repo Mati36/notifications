@@ -19,6 +19,8 @@ class Topic_controller < Sinatra::Base
       Topic_service.add_topic(params['topic'])
       redirect back
     rescue Validation_model_error => e
+      @topics = Topic.all
+      erb :topic_list, :locals => {:error_message => e.message}
       redirect back
     end
   end

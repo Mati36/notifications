@@ -5,6 +5,9 @@
         <title>topic:list</title>
     </head>
     <body>
+        <% if defined? error_message %>
+            <%=erb :error_msg, :locals => {:error_message => error_message} %>
+        <%end%>
         <%= erb :search_input%>
         <% if @current_user.is_admin%>
             <%= erb :new_topic %>   
