@@ -3,10 +3,6 @@ class Tag < Sequel::Model(:documents_users)
   many_to_one :users
 
   dataset_module do
-    
-    def documents_of_user(user_id)
-      where(user_id: user_id).order(:created_at)
-    end
 
     def find_document_user(user_id, document_id)
       find(user_id: user_id, document_id: document_id)
@@ -16,30 +12,8 @@ class Tag < Sequel::Model(:documents_users)
       find(user_id: user_id, document_id: document_id, favorite: true)
     end
 
-    def notifications_checked(notifications)
-      notifications.each do |notification|
-        notification.update(check_notification: true)
-      end
-    end
-
-    def notifications_count(user_id)
-      where(user_id: user_id, check_notification: false).count
-    end
-
-    def recent_notification(user_id, all, limit) 
-      documents_of_user(user_id)
-      .limit(all - limit)
-      .offset(limit)
-    end   
-
-    def delete_old_views(user)
-      notification = documents_of_user(user.id)
-      limit = 30
-      return unless notification.count > limit
-      
-      recent_notification(user.id, notification.count, limit).each do |n|
-        user.remove_document(Document.find(id: n.document_id)) if n.check_notification && !n.tag && !n.favorite
-      end
+    def users_taggeds(doc_id)
+      where(document_id: doc_id, tag: true)
     end
   end
 end
