@@ -19,7 +19,6 @@ class Document_controller < Sinatra::Base
   get '/save_document' do
     @topics = Topic.map(&:to_hash).to_json
     @users  = User.exclude(id: @current_user.id).map(&:to_hash).to_json
-    @current_user = User.find(id: session[:user_id])
     erb :save_document
   end
 
@@ -27,9 +26,7 @@ class Document_controller < Sinatra::Base
 
     if params[:fileInput]
       file = params[:fileInput] [:tempfile]
-      @file_format = File.extname(file)
       @directory = 'public/files/'
-      @directory_temp = DateTime.now.strftime('%m/%d/%Y: %T').to_s
       title = params['title'] 
       type_file = params['type'] 
       description = params['description']
@@ -37,7 +34,7 @@ class Document_controller < Sinatra::Base
       tag = params['tag']
 
       begin
-          document = Document_service.create_document(title, type_file, @file_format, description, @current_user.id, @directory_temp, true, topic, tag, file)  
+          document = Document_service.create_document(file, title, description, type_file, @current_user, topic, tag)  
           redirect '/'
       rescue Validation_model_error => e
         return erb :save_document
@@ -54,7 +51,7 @@ class Document_controller < Sinatra::Base
     doc_id = params['download_document'].to_i 
     begin 
       document = Document_service.download_document(doc_id)
-      name_doc = "#{document.id}#{document.format}"
+      name_doc = "#{document.title}_#{document.id}#{document.format}"
       send_file("public#{document.path}", filename: name_doc) #type: 'Application/octet-stream'
     rescue File_not_found => e 
       redirect back 
@@ -69,10 +66,10 @@ class Document_controller < Sinatra::Base
 
   get '/doc_view/:id' do
     doc_id =  params[:id].to_i
-    Document_service.doc_view(doc_id, @current_user)
     @document = Document.find(id: doc_id)
-    @tagged = Tag.where(document_id: doc_id, tag: true)
+    @tagged = Tag.users_taggeds(doc_id)
     @topics = Document_topic.where(document_id: doc_id)
+    Document_service.doc_view(@document, @current_user)
     erb :doc_view, layout: false
   end
 
@@ -98,5 +95,19 @@ class Document_controller < Sinatra::Base
     erb :documents
   end
 
+  post '/delete_doc' do
+    doc_id = params['delete_doc']
+    begin
+      Document_service.delete_doc(doc_id) 
+      redirect back
+    rescue File_not_found => e 
+      redirect back
+    end  
+  end
+
+  get '/list_document_topic/:id' do
+    @documents = Document.join(Document_topic.where(topic_id: params[:id]), document_id: :id).order(:created_at).reverse
+    erb :documents
+  end
   
 end 

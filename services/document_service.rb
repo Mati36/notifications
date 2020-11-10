@@ -1,29 +1,31 @@
 class Document_service 
   require './models/user.rb'
   require './models/topic.rb'
+  require './services/tag_service.rb'
   require './exceptions/validation_model_error.rb'
   require './exceptions/file_not_found.rb'
   include FileUtils::Verbose
   
-  def self.create_document(title, type, file_format, description, user_id, path, visibility, topic, tag, file)
-      @directory = 'public/files/'
+  def self.create_document(file, title, description, type, current_user, topic, tag)
+      file_format = File.extname(file)
+      path_temp = " #{App.date_time.to_s}#{file_format}"
       document = Document.new(title: title, type: type, format: file_format,
-                              description: description, user_id: user_id,
-                              path: path, visibility: visibility)
+                              description: description, user_id: current_user.id,
+                              path: path_temp, visibility: true)
       unless document.valid?
           raise Validation_model_error.new("Documento no valido")
       end
       document.save
       id = Document.last.id
-      @local_path = "#{@directory}#{id}#{file_format}"
-      document.update(path: "/files/#{id}#{file_format}")
+      local_path = "public/files/#{title}_#{id}#{file_format}"
+      document.update(path: "/files/#{title}_#{id}#{file_format}")
 
-      #App.tags_user(tag, document)
-      Document.add_topics(document, topic)
-      #App.user_add_notification(document)
+      Tag_service.tags_user(tag, document, current_user)
+      add_topics(document, topic)
+      Tag_service.user_add_notification(document,current_user)
 
-      FileUtils.cp(file.path, @local_path)
-      File.chmod(0o777, @local_path)
+      FileUtils.cp(file.path, local_path)
+      File.chmod(0o777, local_path)
   end  
   
   def self.user_cheked_document(document,current_user)
@@ -65,13 +67,16 @@ class Document_service
   end
 
   
-  def self.doc_view (doc_id, current_user)
-    document = Document.find(id: doc_id)
-    user_cheked_document(document, current_user)
+  def self.doc_view (document, current_user)
+    user_cheked_document(document, current_user) unless document
   end
 
-  def self.delete_doc(document)
-    document&.update(visibility: false) unless document.nil?
+  def self.delete_doc(doc_id)
+    document = Document.find(id: doc_id)
+    unless document
+      raise File_not_found.new("Archivo inexistente")
+    end   
+    document.update(visibility: false) 
   end
 
   def self.user_add_favorite_document(document,current_user)
