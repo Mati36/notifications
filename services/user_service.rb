@@ -68,6 +68,6 @@ class User_service
             raise Validation_model_error.new("Datos vacios")
         end
         user.update(name:name_edited, lastname: lastname_edited,
-                    email: email_edited, updated_at: DateTime.now.strftime('%m/%d/%Y: %T'))
+                    email: email_edited, updated_at: App.date_time)
     end 
 end    
