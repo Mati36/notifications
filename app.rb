@@ -60,7 +60,7 @@ class App < Sinatra::Base
     end
   end
    
-  def self.ws_open(ws)
+  def ws_open(ws)
     ws.onopen do
       @connection = { user: @current_user.id, socket: ws }
       settings.sockets << @connection
@@ -69,7 +69,7 @@ class App < Sinatra::Base
 
   def self.ws_msj
     settings.sockets.each do |s|
-      notif = Tag.notifications_count(s[:user])
+      notif = Tag_service .notifications_count(s[:user])
       s[:socket].send(notif.to_s)
     end
   end
@@ -96,57 +96,7 @@ class App < Sinatra::Base
       })
   end
 
-  #get '/list_document_topic/:id' do
-  #  @documents = Document.join(Document_topic.where(topic_id: params[:id]), document_id: :id).order(:created_at).reverse
-  #  erb :documents
-  #end
-
-  # get '/notifications' do
-  #   erb :notifications
-  # end
-
-  # post '/notifications' do
-  #   @notifications.each do |notification|
-  #     notification.update(check_notification: true)
-  #   end
-  # end
-
   def self.date_time
     DateTime.now.strftime('%m/%d/%Y: %T')
   end
-
-  # def tags_user(tag_user, document)
-  #   users = obtain_tags(tag_user)
-
-  #   users.each do |user_dni|
-  #     if !user_dni.empty? && !@current_user.dni.to_s.eql?(user_dni)
-  #       user = User.find_user_dni(user_dni)
-  #       user.add_document(document) unless Tag.find(user_id: user.id, document_id: document.id)
-  #       Tag.find(user_id: user.id, document_id: document.id).update(tag: true, check_notification: false)
-  #     end
-  #     send_mail(user.email, document, 1) # motive 1: tag an user
-  #   end
-  #   ws_msj
-  # end
-
-  # def user_add_notification(document)
-  #   User.exclude(id: @current_user.id).each do |user|
-  #     user_tagged = Tag.find(user_id: user.id, document_id: document.id)
-  #     next unless !user.nil? && !user_tagged
-
-  #     document.topics.each do |topic|
-  #       next unless !user_tagged && Subscription.find(user_id: user.id, topic_id: topic.id)
-
-  #       user.add_document(document)
-  #       send_mail(user.email, document, 2)
-  #       # motive 2: A document was added with a topic that the user is subscribed to
-  #     end
-  #     ws_msj
-  #   end
-  # end
-
-  # def obtain_tags(tags_user)
-  #   tags_user.split('@').reject(&:empty?)
-  # end
-  
 end
