@@ -11,6 +11,7 @@ gem 'sequel'
 gem 'sinatra', '2.0.7'
 gem 'sinatra-websocket'
 gem 'thin'
+gem 'sinatra-flash', '~> 0.3.0'
 
 group :development do
   gem 'dotenv', '2.7.5'

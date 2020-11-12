@@ -5,8 +5,8 @@
         <title>topic:list</title>
     </head>
     <body>
-        <% if defined? error_message %>
-            <%=erb :error_msg, :locals => {:error_message => error_message} %>
+        <% if flash[:error_message] %>
+            <p style="color: red"><%= flash[:error_message] %></p>
         <%end%>
         <%= erb :search_input%>
         <% if @current_user.is_admin%>
