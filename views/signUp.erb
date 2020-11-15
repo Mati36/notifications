@@ -7,8 +7,10 @@
        
     </head>
     <body>
+        <% if flash[:error_message] %>
+            <p style="color: red"><%= flash[:error_message] %></p>
+        <%end%>
         <form class="w3-container " style="width:60%" action="/signUp" method="POST">
-
             <p>
                 <label for="dni">DNI*</label>
                 <input id="dni" class="w3-input w3-border w3-round "type="text"  name="dni"  maxlength="8" pattern="[0-9]{8}" required 

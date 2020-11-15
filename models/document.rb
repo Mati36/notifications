@@ -2,7 +2,7 @@ class Document < Sequel::Model
   plugin :validation_helpers
   def validate
     super
-    validates_presence %i[title type format visibility path], message: 'Datos en blanco o vacios'
+    validates_presence %i[title type format visibility path], message: 'Datos en blanco'
     validates_unique [:path], message: 'Documento repetido'
   end
 

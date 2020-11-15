@@ -1,5 +1,4 @@
 require 'json'
-require './services/account_service.rb'
 require 'sinatra/base'
 require './exceptions/validation_model_error.rb'
 
@@ -14,6 +13,8 @@ class Account_controller < Sinatra::Base
     @icons = '/images/icons/'
   end 
 
+  register Sinatra::Flash
+
   post '/signUp' do
     name = params[:name]
     lastname = params[:lastname]
@@ -21,19 +22,20 @@ class Account_controller < Sinatra::Base
     email = params[:email]
     pwd = params[:pwd]
     begin
-      Account_service.sign_up(name, lastname, dni, email, pwd)
+      User_service.create_user(name,lastname,dni,email,pwd)
       redirect '/login'
-    rescue Validation_model_error => e
+    rescue Sequel::ValidationFailed  => e
+      flash[:error_message] = e.message
       return erb :signUp
     end
-    
   end
    
-   get '/signUp' do
-     erb :signUp
-   end
+  get '/signUp' do
+    flash[:error_message] = ''
+    erb :signUp
+  end
   
-   get '/log_out' do
+  get '/log_out' do
     session.clear if @current_user
     redirect '/'
   end
@@ -52,7 +54,7 @@ class Account_controller < Sinatra::Base
       session[:user_id] = user.id
       redirect '/'
     else
-      redirect '/login'
+     redirect '/login'
     end
   end
 end 

@@ -4,9 +4,11 @@
         <meta charset = "utf-8">
         <title>edit_profile</title>
         <link rel="stylesheet" href="css/loginStyle.css">
-
     </head>
     <body>
+        <% if flash[:error_message] %>
+            <p style="color: red"><%= flash[:error_message] %></p>
+        <%end%>
         <div>
             <form action="/edit_profile" method="POST" enctype="multipart/form-data">
                 <h1>Editar Perfil</h1>
@@ -22,7 +24,6 @@
                     <input type="text" name="lastname" value= <%=@current_user.lastname%> / data-validation="alphanumeric" >
                     <label for="email">Email</label> 
                     <input type="text" name="email" value= <%=@current_user.email%> / data-validation="email" >  
-                   
                     <input type="submit" value="Aceptar">  
                 </div>
             </form>   
