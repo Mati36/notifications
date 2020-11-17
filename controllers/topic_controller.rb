@@ -3,7 +3,6 @@ require './services/topic_service.rb'
 require 'sinatra/base'
 require './exceptions/validation_model_error.rb'
 require './exceptions/unexistent_element_error.rb'
-require 'sinatra/flash'
 
 class Topic_controller < Sinatra::Base
   configure :development, :production do
@@ -23,14 +22,14 @@ class Topic_controller < Sinatra::Base
       redirect back
     rescue Validation_model_error => e
       @topics = Topic.all
-      flash[:error_message] = e.message
+      flash.now[:error_message] = e.message
       redirect back
       end
   end
 
   get '/topic_list' do
       @topics = Topic.all
-      flash[:error_message] = ''
+      flash.now[:error_message] = ''
       erb :topic_list 
   end
 
@@ -39,7 +38,7 @@ class Topic_controller < Sinatra::Base
       Topic_service.delete_topic(params['del_topic'])
       redirect back
     rescue Unexistent_element_error => e
-      flash[:error_message] = e.message
+      flash.now[:error_message] = e.message
       redirect back
     end
   end
@@ -49,7 +48,7 @@ class Topic_controller < Sinatra::Base
       Topic_service.subscribe_topic(@current_user, params['sub_topic'])
       redirect back
     rescue Unexistent_element_error => e
-      flash[:error_message] = e.message
+      flash.now[:error_message] = e.message
       redirect back
     end
   end
@@ -59,7 +58,7 @@ class Topic_controller < Sinatra::Base
       Topic_service.desubscribe_topic(@current_user, params['sub_topic'])
       redirect back
     rescue Unexistent_element_error => e
-      flash[:error_message] = e.message
+      flash.now[:error_message] = e.message
       redirect back
     end
   end

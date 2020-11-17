@@ -66,7 +66,7 @@ class Document_service
 
   
   def self.doc_view (document, current_user)
-    unless File.exists?(document.path)
+    if !File.exists?("public/#{document.path}")
       raise File_not_found.new("Archivo inexistente") 
     end   
     user_cheked_document(document, current_user) unless document

@@ -25,7 +25,7 @@ class User_controller < Sinatra::Base
     
     get '/users_list' do
         @users = User.all
-        flash[:error_message] = ''
+        flash.now[:error_message] = ''
         erb :users_list
     end
 
@@ -38,7 +38,7 @@ class User_controller < Sinatra::Base
             User_service.change_password(@current_user,current_pass,new_pwd,rep_new_pwd)
             redirect '/edit_profile'
         rescue Validation_model_error => e
-            flash[:error_message] = e.message
+            flash.now[:error_message] = e.message
             return erb :change_password
         end
     end       
@@ -47,7 +47,7 @@ class User_controller < Sinatra::Base
         begin
             User_service.add_admin(params['addAdmin_id'])
         rescue Unexistent_element_error => e
-            flash[:error_message] = e.message
+            flash.now[:error_message] = e.message
             return redirect back
         end
         redirect back
@@ -57,7 +57,7 @@ class User_controller < Sinatra::Base
         begin
             User_service.del_admin(params['delAdmin_id'])
         rescue Unexistent_element_error => e
-            flash[:error_message] = e.message
+            flash.now[:error_message] = e.message
             return redirect back
         end
         redirect back
@@ -67,7 +67,7 @@ class User_controller < Sinatra::Base
         begin
             User_service.del_user(params['delete_user_id'])
         rescue Validation_model_error => e
-            flash[:error_message] = e.message
+            flash.now[:error_message] = e.message
             return redirect back
         end
         redirect back
@@ -79,7 +79,7 @@ class User_controller < Sinatra::Base
       end
     
     get '/edit_profile' do
-        flash[:error_message] = ''
+        flash.now[:error_message] = ''
         erb :edit_profile
     end
 
@@ -89,7 +89,7 @@ class User_controller < Sinatra::Base
             User_service.edit_profile(@current_user,file,params['name'],params['lastname'],params['email'])
             redirect "/profile/#{@current_user.id}"
         rescue Sequel::ValidationFailed => e
-            flash[:error_message] = e.message
+            flash.now[:error_message] = e.message
             return redirect back
         end
     end    

@@ -25,7 +25,7 @@ class Account_controller < Sinatra::Base
       User_service.create_user(name,lastname,dni,email,pwd)
       redirect '/login'
     rescue Sequel::ValidationFailed  => e
-      flash[:error_message] = e.message
+      flash.now[:error_message] = e.message
       return erb :signUp
     end
   end
