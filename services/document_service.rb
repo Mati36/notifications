@@ -12,9 +12,9 @@ class Document_service
       document = Document.new(title: title, type: type, format: file_format,
                               description: description, user_id: current_user.id,
                               path: path_temp, visibility: true)
-      unless document.valid?
-          raise Validation_model_error.new("Documento no valido")
-      end
+      # unless document.valid?
+      #     raise Validation_model_error.new("Documento no valido")
+      # end
       document.save
       id = Document.last.id
       local_path = "public/files/#{title}_#{id}#{file_format}"
@@ -66,6 +66,9 @@ class Document_service
 
   
   def self.doc_view (document, current_user)
+    if !File.exists?("public/#{document.path}")
+      raise File_not_found.new("Archivo inexistente") 
+    end   
     user_cheked_document(document, current_user) unless document
   end
 

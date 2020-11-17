@@ -5,6 +5,9 @@
         <title>topic:list</title>
     </head>
     <body>
+        <% if flash[:error_message] %>
+            <p style="color: red"><%= flash[:error_message] %></p>
+        <%end%>
         <%= erb :search_input%>
         <% if @current_user.is_admin%>
             <%= erb :new_topic %>   

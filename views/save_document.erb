@@ -8,6 +8,9 @@
     </head>
     <body>
     <div class="w3-display-container "style="height:500px;" >
+        <% if flash[:error_message] %>
+            <p style="color: red"><%= flash[:error_message] %></p>
+        <%end%>
         <form class="w3-margin-left"  action="save_document" method="POST" enctype="multipart/form-data">
             <div class="w3-container w3-cell-row w3-padding-32 " >
                     <div class="w3-display-bottommiddle w3-margin-bottom w3-padding-32" style="width:30%">

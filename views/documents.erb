@@ -8,6 +8,9 @@
     <body>
         <%= erb :search_input%>
         <%= erb :filter_documents%>
+        <% if flash[:error_message] %>
+            <p style="color: red"><%= flash[:error_message] %></p>
+        <%end%>
         <table class="w3-table-all w3-hoverable w3-card-4" id="list">
             <tr class="w3-blue" >
                 <th>Titulo</th>

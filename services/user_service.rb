@@ -13,23 +13,23 @@ class User_service
     def self.create_user(name, lastname, dni, email, password)
         user = User.new(name: name, lastname: lastname, dni: dni,
                         email: email, password: encrypt_password(password))
-
+        user.save
         user.update(is_admin: true) if User.all.length <= 0
-        user
+        User.order(user.id)
     end
 
     def self.change_password(current_user, current_pass, new_pwd, rep_new_pwd) 
         if correct_password(current_user, current_pass) && new_pwd == rep_new_pwd
             current_user.update(password: encrypt_password(new_pwd)) 
         else
-            raise Validation_model_error.new("contraseña no valida")
+            raise Validation_model_error.new("Contraseña no valida",2)
         end     
     end  
     
     def self.add_admin(user_id)
         user = User.find_user_id(user_id)
         unless user
-            raise Validation_model_error.new("Usuario no existe")
+            raise Unexistent_element_error.new("Usuario no existe",2)
         end 
         user.update(is_admin: true)
     end 
@@ -37,7 +37,7 @@ class User_service
     def self.del_admin(user_id)
         user = User.find_user_id(user_id)
         unless user
-            raise Validation_model_error.new("Usuario no existe")
+            raise Unexistent_element_error.new("Usuario no existe",2)
         end 
         user.update(is_admin: false)
     end   
@@ -45,7 +45,7 @@ class User_service
     def self.del_user(user_id)
         user = User.find_user_id(user_id)
         unless user
-            raise Validation_model_error.new("Usuario no existe")
+            raise Unexistent_element_error.new("Usuario no existe",2)
         end 
         user.remove_all_documents
         user.remove_all_topics
@@ -62,10 +62,6 @@ class User_service
             File.open(directory, 'wb') do |f|
                 f.write(file_img.read)
             end
-        end
-
-        if name_edited.empty? || lastname_edited.empty? || email_edited.empty?
-            raise Validation_model_error.new("Datos vacios")
         end
         user.update(name:name_edited, lastname: lastname_edited,
                     email: email_edited, updated_at: App.date_time)
