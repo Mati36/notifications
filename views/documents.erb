@@ -8,6 +8,9 @@
     <body>
         <%= erb :search_input%>
         <%= erb :filter_documents%>
+        <% if flash[:error_message] %>
+            <p style="color: red"><%= flash[:error_message] %></p>
+        <%end%>
         <table class="w3-table-all w3-hoverable w3-card-4" id="list">
             <tr class="w3-blue" >
                 <th>Titulo</th>
@@ -21,9 +24,9 @@
                 <% end %> 
             </tr>
             <%@documents.each do |document| 
-                doc = find_document_user(@current_user.id, document.id)
+                doc = Tag.find(user_id: @current_user.id, document_id: document.id) 
                 #hacer mas optimas estas validaciones 
-                if doc 
+                if !doc.nil? 
                     if doc.checked %>
                         <tr id="row" class="w3-hover-cyan w3-grey">    
                     <%else%>
@@ -39,7 +42,7 @@
                         <td><%=document.created_at.to_date%></td>
                         <td><%=document.description%></td>
 
-                        <% if !find_document_favorite(@current_user.id,document.id) && request.path_info != '/my_favorites' %> 
+                        <% if !Tag.find(user_id: @current_user.id, document_id: document.id, favorite: true) && request.path_info != '/my_favorites' %> 
                             <td><button class="w3-button" name="add_favorite_doc" type="submit" value="<%=document.id%>" formaction="/add_fav"><i><img src=" <%=@icons+"disabled-star.png"%>"></i></button> </td>
                         <%else%>
                             <td><button class="w3-button" name="del_favorite_doc" type="submit" value="<%=document.id%>" formaction="/del_fav"><i><img src="<%=@icons+"enabled-star.png"%>"></i></button> </td>

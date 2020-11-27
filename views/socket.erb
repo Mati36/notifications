@@ -20,7 +20,7 @@
             <form id="form" action="/notifications" method="GET">
               <button type="submit" id="btn_notyf" class="w3-button w3-small w3-circle w3-padding-16"  > 
                 <span name="span"  id="notification" class="w3-badge w3-red w3-small w3-circle w3-margin-left ">
-                    <%=get_notification_count(@current_user.id)%>
+                    <%=Tag_service.notifications_count(@current_user.id)%>
                 </span>              
                 <i class="w3-xlarge w3-circle w3-margin-right"> 
                     <img  src=<%=@icons+"bell.png"%> >
